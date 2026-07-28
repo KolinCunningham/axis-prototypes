@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio-Wide Lodgement Risk Triage: AXIS Partners</title>
+<style>
+  :root {
+    --navy:#1a2b45; --green:#0d7a5f; --light-green:#e8f5f1; --gold:#c9a84c;
+    --cream:#f8f9fb; --border:#e2e8f0; --muted:#6b7280;
+    --red:#c0392b; --light-red:#fdecea; --light-gold:#fbf3df;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background: var(--cream);
+    color: #1f2937;
+  }
+  .sans { font-family: 'Helvetica Neue', Arial, sans-serif; }
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+
+  /* ---- Summary strip ---- */
+  .summary-strip {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .summary-card {
+    flex: 1 1 200px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    padding: 18px 20px;
+    border-left: 4px solid var(--muted);
+  }
+  .summary-card.high { border-left-color: var(--red); }
+  .summary-card.medium { border-left-color: var(--gold); }
+  .summary-card.low { border-left-color: var(--green); }
+  .summary-card.due { border-left-color: var(--navy); }
+  .summary-card .num {
+    font-size: 30px;
+    font-weight: 700;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1;
+  }
+  .summary-card.high .num { color: var(--red); }
+  .summary-card.medium .num { color: #a8842f; }
+  .summary-card.low .num { color: var(--green); }
+  .summary-card.due .num { color: var(--navy); }
+  .summary-card .label {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ---- Controls ---- */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .search-box {
+    flex: 1 1 240px;
+    position: relative;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    background: #fff;
+    color: #1f2937;
+  }
+  .search-box input:focus {
+    outline: none;
+    border-color: var(--green);
+  }
+  .filter-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--muted);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .pill:hover { border-color: var(--navy); color: var(--navy); }
+  .pill.active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #fff;
+  }
+  .pill.active.high { background: var(--red); border-color: var(--red); }
+  .pill.active.medium { background: var(--gold); border-color: var(--gold); color: #3a2f10; }
+  .pill.active.low { background: var(--green); border-color: var(--green); }
+
+  .result-count {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* ---- Table card ---- */
+  .table-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border-left: 4px solid var(--green);
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+  }
+  thead th {
+    text-align: left;
+    padding: 12px 14px;
+    background: var(--light-green);
+    color: var(--navy);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  thead th:hover { background: #dcf0e8; }
+  thead th .arrow {
+    display: inline-block;
+    margin-left: 4px;
+    opacity: 0.4;
+    font-size: 10px;
+  }
+  thead th.sorted .arrow { opacity: 1; color: var(--green); }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.1s ease;
+  }
+  tbody tr:hover { background: var(--light-green); }
+  tbody tr.expanded { background: #f1f7f5; }
+  tbody tr:last-child { border-bottom: none; }
+  td {
+    padding: 12px 14px;
+    vertical-align: middle;
+    font-family: Georgia, serif;
+  }
+  td.sans-cell { font-family: 'Helvetica Neue', Arial, sans-serif; }
+  .client-name { font-weight: bold; color: var(--navy); }
+  .entity-tag {
+    display: inline-block;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+  .risk-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+  .risk-badge.high { background: var(--light-red); color: var(--red); }
+  .risk-badge.medium { background: var(--light-gold); color: #a8842f; }
+  .risk-badge.low { background: var(--light-green); color: var(--green); }
+  .risk-score {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .risk-score.high { color: var(--red); }
+  .risk-score.medium { color: #a8842f; }
+  .risk-score.low { color: var(--green); }
+
+  .doc-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .doc-bar-track {
+    width: 60px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .doc-bar-fill { height: 100%; border-radius: 4px; }
+  .doc-bar-fill.high { background: var(--red); }
+  .doc-bar-fill.medium { background: var(--gold); }
+  .doc-bar-fill.low { background: var(--green); }
+  .doc-pct { font-family:'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: var(--muted); min-width: 32px; }
+
+  .due-soon { color: var(--red); font-weight: bold; }
+
+  /* ---- Detail panel ---- */
+  .detail-row td {
+    padding: 0;
+    background: #f1f7f5;
+  }
+  .detail-inner {
+    padding: 16px 24px 20px 24px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    color: #374151;
+    border-left: 3px solid var(--green);
+    margin: 0 14px 14px 14px;
+    display: none;
+  }
+  .detail-row.open .detail-inner { display: block; }
+  .detail-inner .why-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .detail-inner ul {
+    margin: 0;
+    padding-left: 18px;
+    line-height: 1.7;
+  }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px 24px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .detail-grid .kv-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+  .detail-grid .kv-value { font-size: 13px; color: #1f2937; font-weight: 600; margin-top: 2px; }
+
+  /* ---- AI assist ---- */
+  .ai-assist-wrap {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .ai-assist-btn {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--green);
+    background: #fff;
+    border: 1px solid var(--green);
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .ai-assist-btn:hover:not(:disabled) { background: var(--light-green); }
+  .ai-assist-btn:disabled { opacity: 0.6; cursor: default; }
+  .ai-thinking {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .ai-dots { display: inline-flex; gap: 3px; }
+  .ai-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--green);
+    opacity: 0.3;
+    animation: aiPulse 1s infinite ease-in-out;
+  }
+  .ai-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .ai-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes aiPulse {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.85); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+  .ai-result {
+    flex-basis: 100%;
+    margin-top: 2px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+  .ai-result-label {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #a8842f;
+    margin-bottom: 8px;
+  }
+  .ai-result-text {
+    font-family: Georgia, serif;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: #1f2937;
+    white-space: pre-line;
+  }
+
+  .no-results {
+    padding: 40px;
+    text-align: center;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--muted);
+  }
+
+  @media (max-width: 700px) {
+    table { font-size: 12px; }
+    thead th, td { padding: 8px 8px; }
+    .doc-bar-track { width: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<header style="background:linear-gradient(135deg, var(--navy) 0%, #243b5e 100%); color:white; padding:28px 40px;">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; max-width:1100px; margin:0 auto;">
+    <a href="https://www.axispartners.com.au/" target="_blank" rel="noopener">
+      <img src="./axis-logo.png" alt="AXIS Partners" style="height:38px; filter:brightness(0) invert(1);">
+    </a>
+    <div style="text-align:right;">
+      <div style="display:inline-block; background:var(--green); color:white; font-family:'Helvetica Neue',Arial,sans-serif; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:4px 12px; border-radius:20px; margin-bottom:8px;">Bokkas &middot; AI Prototype</div>
+      <h1 style="margin:0; font-size:22px;">Portfolio-Wide Lodgement Risk Triage</h1>
+    </div>
+  </div>
+</header>
+
+<main>
+  <p class="sans" style="color:var(--muted); font-size:14px; margin-top:0; margin-bottom:24px; max-width:720px;">
+    Every client in the book, ranked by risk of missing their next lodgement, scored on late-lodgement history,
+    current document completeness and entity complexity. Built to answer one question every Monday:
+    <strong style="color:var(--navy);">who do we chase this week?</strong>
+  </p>
+
+  <div class="summary-strip" id="summaryStrip"></div>
+
+  <div class="controls">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search by client name…" class="sans">
+    </div>
+    <div class="filter-pills" id="filterPills">
+      <button class="pill active" data-tier="all">All Clients</button>
+      <button class="pill high" data-tier="High">High Risk</button>
+      <button class="pill medium" data-tier="Medium">Medium Risk</button>
+      <button class="pill low" data-tier="Low">Low Risk</button>
+    </div>
+  </div>
+
+  <div class="result-count" id="resultCount"></div>
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th data-key="name">Client <span class="arrow">▲▼</span></th>
+          <th data-key="entity">Entity <span class="arrow">▲▼</span></th>
+          <th data-key="lodgementType">Lodgement <span class="arrow">▲▼</span></th>
+          <th data-key="dueDate">Due Date <span class="arrow">▲▼</span></th>
+          <th data-key="docPct">Docs <span class="arrow">▲▼</span></th>
+          <th data-key="lateHistoryLabel">Late History <span class="arrow">▲▼</span></th>
+          <th data-key="riskScore">Risk Score <span class="arrow">▲▼</span></th>
+          <th data-key="tier">Tier <span class="arrow">▲▼</span></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div class="no-results" id="noResults" style="display:none;">No clients match this search / filter.</div>
+  </div>
+</main>
+
+<footer style="text-align:center; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); padding:24px; border-top:1px solid var(--border); margin-top:40px;">
+  Prototype built by Bokkas for AXIS Partners &middot; all client data shown is fictional/mock, not connected to any live system &middot; <a href="https://www.axispartners.com.au/" target="_blank" rel="noopener" style="color:var(--green);">axispartners.com.au</a>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- Mock "today" for the prototype, matches the dataset's due-date spread ----
+  var TODAY = new Date(2026, 6, 28); // 28 Jul 2026
+
+  // ---- Mock dataset (25 fictional clients, no real AXIS clients) ----
+  var RAW = [
+    { name: "Marlin Bay Fisheries Pty Ltd", entity: "Company", lodgementType: "BAS", dueDate: "2026-07-30", docPct: 35, lateCount: 2, lateOf: 3, complexity: ["Multiple entities"] },
+    { name: "Hartnell Family Trust", entity: "Trust", lodgementType: "Tax Return", dueDate: "2026-08-04", docPct: 20, lateCount: 3, lateOf: 3, complexity: ["Trust distribution complexity"] },
+    { name: "Coastline Plumbing & Gas", entity: "Individual", lodgementType: "BAS", dueDate: "2026-08-10", docPct: 78, lateCount: 0, lateOf: 3, complexity: [] },
+    { name: "Birchgrove Dental Studio Pty Ltd", entity: "Company", lodgementType: "Tax Return", dueDate: "2026-09-15", docPct: 55, lateCount: 1, lateOf: 3, complexity: [] },
+    { name: "Kirribilli Wealth SMSF", entity: "SMSF", lodgementType: "SMSF Annual Return", dueDate: "2026-08-02", docPct: 40, lateCount: 2, lateOf: 3, complexity: ["SMSF", "In pension phase"] },
+    { name: "Norlane Engineering Co", entity: "Company", lodgementType: "BAS", dueDate: "2026-08-15", docPct: 90, lateCount: 0, lateOf: 3, complexity: [] },
+    { name: "Tallow & Vine Cafe Group", entity: "Trust", lodgementType: "BAS", dueDate: "2026-07-31", docPct: 25, lateCount: 2, lateOf: 3, complexity: ["Multiple entities", "Trust distribution complexity"] },
+    { name: "Redgum Freight Solutions", entity: "Company", lodgementType: "Tax Return", dueDate: "2026-10-31", docPct: 62, lateCount: 1, lateOf: 3, complexity: [] },
+    { name: "Wallabadah Grazing Co Pty Ltd", entity: "Company", lodgementType: "Tax Return", dueDate: "2026-08-06", docPct: 15, lateCount: 3, lateOf: 3, complexity: ["Multiple entities", "Primary production concessions"] },
+    { name: "Lightfoot & Associates SMSF", entity: "SMSF", lodgementType: "SMSF Annual Return", dueDate: "2026-09-01", docPct: 70, lateCount: 0, lateOf: 3, complexity: ["SMSF"] },
+    { name: "Manly Cove Physiotherapy", entity: "Individual", lodgementType: "Tax Return", dueDate: "2026-10-31", docPct: 85, lateCount: 0, lateOf: 3, complexity: [] },
+    { name: "Bellambi Steel Fabrication", entity: "Company", lodgementType: "BAS", dueDate: "2026-08-01", docPct: 30, lateCount: 2, lateOf: 3, complexity: ["Multiple entities"] },
+    { name: "Yarravale Family Trust", entity: "Trust", lodgementType: "Tax Return", dueDate: "2026-08-20", docPct: 48, lateCount: 1, lateOf: 3, complexity: ["Trust distribution complexity"] },
+    { name: "Pittwater Boat Charters Pty Ltd", entity: "Company", lodgementType: "BAS", dueDate: "2026-08-12", docPct: 66, lateCount: 0, lateOf: 3, complexity: [] },
+    { name: "Corrimal Retirement SMSF", entity: "SMSF", lodgementType: "SMSF Annual Return", dueDate: "2026-07-29", docPct: 10, lateCount: 3, lateOf: 3, complexity: ["SMSF", "In pension phase", "Related-party loan"] },
+    { name: "Ashfield Migrant Legal Services", entity: "Individual", lodgementType: "Tax Return", dueDate: "2026-10-31", docPct: 95, lateCount: 0, lateOf: 3, complexity: [] },
+    { name: "Blaxland Ridge Vineyard Trust", entity: "Trust", lodgementType: "Tax Return", dueDate: "2026-08-25", docPct: 33, lateCount: 2, lateOf: 3, complexity: ["Trust distribution complexity", "Primary production concessions"] },
+    { name: "Chatswood IT Consulting Pty Ltd", entity: "Company", lodgementType: "BAS", dueDate: "2026-08-05", docPct: 58, lateCount: 1, lateOf: 3, complexity: [] },
+    { name: "Merewether Surf Supplies", entity: "Individual", lodgementType: "BAS", dueDate: "2026-08-18", docPct: 72, lateCount: 0, lateOf: 3, complexity: [] },
+    { name: "Turramurra Orthodontics SMSF", entity: "SMSF", lodgementType: "SMSF Annual Return", dueDate: "2026-08-03", docPct: 22, lateCount: 2, lateOf: 3, complexity: ["SMSF", "Related-party loan"] },
+    { name: "Glebe Point Architecture Studio", entity: "Company", lodgementType: "Tax Return", dueDate: "2026-09-30", docPct: 80, lateCount: 0, lateOf: 3, complexity: [] },
+    { name: "Karuah Earthmoving Pty Ltd", entity: "Company", lodgementType: "BAS", dueDate: "2026-07-31", docPct: 18, lateCount: 3, lateOf: 3, complexity: ["Multiple entities"] },
+    { name: "Woy Woy Family Trust", entity: "Trust", lodgementType: "Tax Return", dueDate: "2026-09-10", docPct: 50, lateCount: 1, lateOf: 3, complexity: ["Trust distribution complexity"] },
+    { name: "Dural Equine Veterinary Clinic", entity: "Individual", lodgementType: "Tax Return", dueDate: "2026-10-31", docPct: 88, lateCount: 0, lateOf: 3, complexity: [] },
+    { name: "Illawarra Ridge Wines SMSF", entity: "SMSF", lodgementType: "SMSF Annual Return", dueDate: "2026-08-09", docPct: 44, lateCount: 1, lateOf: 3, complexity: ["SMSF"] }
+  ];
+
+  function daysUntil(dateStr) {
+    var d = new Date(dateStr + "T00:00:00");
+    return Math.round((d - TODAY) / 86400000);
+  }
+
+  function fmtDate(dateStr) {
+    var d = new Date(dateStr + "T00:00:00");
+    return d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
+  }
+
+  // ---- Risk scoring ----
+  // Weighted: late-history 40%, doc gap 35%, complexity 15%, urgency 10%
+  function computeRisk(c) {
+    var lateScore = (c.lateCount / c.lateOf) * 100;          // 0-100
+    var docGapScore = 100 - c.docPct;                        // 0-100, higher = worse
+    var complexityScore = Math.min(c.complexity.length * 33, 100); // 0-100
+    var du = daysUntil(c.dueDate);
+    var urgencyScore = du <= 3 ? 100 : du <= 7 ? 75 : du <= 14 ? 45 : du <= 30 ? 20 : 5;
+
+    var score = (lateScore * 0.40) + (docGapScore * 0.35) + (complexityScore * 0.15) + (urgencyScore * 0.10);
+    return Math.round(score);
+  }
+
+  function tierFor(score) {
+    if (score >= 65) return "High";
+    if (score >= 40) return "Medium";
+    return "Low";
+  }
+
+  function lateHistoryLabel(c) {
+    return "Late " + c.lateCount + " of last " + c.lateOf + " years";
+  }
+
+  var DATA = RAW.map(function (c, i) {
+    var riskScore = computeRisk(c);
+    var tier = tierFor(riskScore);
+    var du = daysUntil(c.dueDate);
+    var reasons = [];
+    reasons.push(lateHistoryLabel(c) + (c.lateCount >= 2 ? ", repeat pattern" : c.lateCount === 1 ? ", one prior slip" : ", clean record"));
+    reasons.push(c.docPct + "% of required documents received" + (c.docPct < 40 ? ", well behind" : c.docPct < 70 ? ", still chasing items" : ", largely complete"));
+    if (c.complexity.length) {
+      reasons.push("Complexity: " + c.complexity.join(", "));
+    } else {
+      reasons.push("No added complexity factors");
+    }
+    reasons.push(du < 0 ? "Overdue by " + Math.abs(du) + " day(s)" : du <= 7 ? "Due in " + du + " day(s), this week" : "Due in " + du + " day(s)");
+
+    return {
+      id: i,
+      name: c.name,
+      entity: c.entity,
+      lodgementType: c.lodgementType,
+      dueDate: c.dueDate,
+      dueDaysUntil: du,
+      docPct: c.docPct,
+      lateHistoryLabel: lateHistoryLabel(c),
+      lateCount: c.lateCount,
+      lateOf: c.lateOf,
+      complexity: c.complexity,
+      riskScore: riskScore,
+      tier: tier,
+      reasons: reasons
+    };
+  });
+
+  // ---- State ----
+  var state = {
+    sortKey: "riskScore",
+    sortDir: "desc",
+    tierFilter: "all",
+    search: "",
+    expandedId: null
+  };
+
+  // ---- AI assist state, keyed by client id ----
+  // status: "idle" | "thinking" | "done"
+  var aiState = {};
+
+  // ---- AI assist: templated draft, built entirely from this client's own row data ----
+  function generateAINote(d) {
+    var urgencyPhrase = d.dueDaysUntil < 0
+      ? "This lodgement is already overdue by " + Math.abs(d.dueDaysUntil) + " day(s)."
+      : d.dueDaysUntil <= 7
+      ? "It's due in " + d.dueDaysUntil + " day(s), inside the one-week window."
+      : "It's due in " + d.dueDaysUntil + " day(s), on " + fmtDate(d.dueDate) + ".";
+
+    var docPhrase = d.docPct < 40
+      ? "We're only holding " + d.docPct + "% of the documents we need, well behind where we'd want to be this close to lodgement."
+      : d.docPct < 70
+      ? "Documents are " + d.docPct + "% complete, a handful of items still outstanding."
+      : "Documents are " + d.docPct + "% complete, close to lodgement-ready.";
+
+    var historyPhrase = d.lateCount >= 2
+      ? d.lateHistoryLabel + ", a repeat pattern worth calling out."
+      : d.lateCount === 1
+      ? d.lateHistoryLabel + ", one prior slip on file."
+      : d.lateHistoryLabel + ", a clean record to date.";
+
+    var complexityPhrase = d.complexity.length
+      ? "Added complexity to factor in: " + d.complexity.join(", ") + "."
+      : "No unusual complexity factors on this file.";
+
+    var actionPhrase = d.tier === "High"
+      ? "Recommend a call this week rather than another email, given the risk score of " + d.riskScore + "/100."
+      : d.tier === "Medium"
+      ? "Worth a direct follow-up this week, risk score sits at " + d.riskScore + "/100."
+      : "Low risk for now, score " + d.riskScore + "/100, a routine reminder should cover it.";
+
+    return "Internal note, " + d.name + " (" + d.entity + ", " + d.lodgementType + ")\n\n" +
+      urgencyPhrase + " " + docPhrase + "\n\n" +
+      "Lodgement history: " + historyPhrase + "\n\n" +
+      complexityPhrase + "\n\n" +
+      actionPhrase;
+  }
+
+  // ---- Elements ----
+  var tbody = document.getElementById("tableBody");
+  var summaryStrip = document.getElementById("summaryStrip");
+  var resultCount = document.getElementById("resultCount");
+  var noResults = document.getElementById("noResults");
+  var searchInput = document.getElementById("searchInput");
+  var filterPills = document.getElementById("filterPills");
+  var headers = document.querySelectorAll("thead th[data-key]");
+
+  function tierClass(tier) {
+    return tier === "High" ? "high" : tier === "Medium" ? "medium" : "low";
+  }
+
+  function renderSummary() {
+    var high = DATA.filter(function (d) { return d.tier === "High"; }).length;
+    var medium = DATA.filter(function (d) { return d.tier === "Medium"; }).length;
+    var low = DATA.filter(function (d) { return d.tier === "Low"; }).length;
+    var dueSoon = DATA.filter(function (d) { return d.dueDaysUntil <= 7; }).length;
+
+    summaryStrip.innerHTML =
+      '<div class="summary-card high"><div class="num">' + high + '</div><div class="label">High risk clients</div></div>' +
+      '<div class="summary-card medium"><div class="num">' + medium + '</div><div class="label">Medium risk clients</div></div>' +
+      '<div class="summary-card low"><div class="num">' + low + '</div><div class="label">Low risk clients</div></div>' +
+      '<div class="summary-card due"><div class="num">' + dueSoon + '</div><div class="label">Due within 7 days</div></div>';
+  }
+
+  function getFiltered() {
+    var q = state.search.trim().toLowerCase();
+    return DATA.filter(function (d) {
+      if (state.tierFilter !== "all" && d.tier !== state.tierFilter) return false;
+      if (q && d.name.toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+  }
+
+  function getSorted(list) {
+    var key = state.sortKey;
+    var dir = state.sortDir === "asc" ? 1 : -1;
+    return list.slice().sort(function (a, b) {
+      var av = a[key], bv = b[key];
+      if (key === "dueDate") { av = a.dueDaysUntil; bv = b.dueDaysUntil; }
+      if (typeof av === "string") av = av.toLowerCase();
+      if (typeof bv === "string") bv = bv.toLowerCase();
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+  }
+
+  function render() {
+    renderSummary();
+    var filtered = getSorted(getFiltered());
+
+    resultCount.textContent = filtered.length + (filtered.length === 1 ? " client shown" : " clients shown") +
+      (state.tierFilter !== "all" ? " · filtered to " + state.tierFilter + " risk" : "") +
+      (state.search ? " · search: “" + state.search + "”" : "");
+
+    if (!filtered.length) {
+      tbody.innerHTML = "";
+      noResults.style.display = "block";
+      return;
+    }
+    noResults.style.display = "none";
+
+    var html = "";
+    filtered.forEach(function (d) {
+      var tc = tierClass(d.tier);
+      var isOpen = state.expandedId === d.id;
+      var dueLabel = fmtDate(d.dueDate);
+      var dueSoonClass = d.dueDaysUntil <= 7 ? "due-soon" : "";
+      var ai = aiState[d.id] || { status: "idle" };
+
+      var aiHtml = '<div class="ai-assist-wrap">' +
+        '<button type="button" class="ai-assist-btn" data-id="' + d.id + '"' + (ai.status === "thinking" ? " disabled" : "") + '>' +
+        (ai.status === "done" ? "Regenerate chase-up note" : "AI: Draft chase-up note") +
+        '</button>';
+      if (ai.status === "thinking") {
+        aiHtml += '<div class="ai-thinking"><span class="ai-dots"><span></span><span></span><span></span></span>Drafting note…</div>';
+      }
+      if (ai.status === "done") {
+        aiHtml += '<div class="ai-result"><div class="ai-result-label">AI draft, internal note</div><div class="ai-result-text">' + escapeHtml(ai.text) + '</div></div>';
+      }
+      aiHtml += '</div>';
+
+      html += '<tr class="data-row' + (isOpen ? ' expanded' : '') + '" data-id="' + d.id + '">' +
+        '<td class="client-name">' + escapeHtml(d.name) + '</td>' +
+        '<td class="sans-cell"><span class="entity-tag">' + d.entity + '</span></td>' +
+        '<td class="sans-cell">' + d.lodgementType + '</td>' +
+        '<td class="sans-cell ' + dueSoonClass + '">' + dueLabel + (d.dueDaysUntil < 0 ? ' (overdue)' : d.dueDaysUntil <= 7 ? ' (this week)' : '') + '</td>' +
+        '<td class="sans-cell"><div class="doc-bar-wrap"><div class="doc-bar-track"><div class="doc-bar-fill ' + tc + '" style="width:' + d.docPct + '%;"></div></div><span class="doc-pct">' + d.docPct + '%</span></div></td>' +
+        '<td class="sans-cell">' + d.lateHistoryLabel + '</td>' +
+        '<td class="sans-cell risk-score ' + tc + '">' + d.riskScore + '</td>' +
+        '<td class="sans-cell"><span class="risk-badge ' + tc + '">' + d.tier + '</span></td>' +
+        '</tr>' +
+        '<tr class="detail-row' + (isOpen ? ' open' : '') + '" data-detail-for="' + d.id + '">' +
+        '<td colspan="8">' +
+        '<div class="detail-inner">' +
+        '<div class="why-title">Why this score</div>' +
+        '<ul>' + d.reasons.map(function (r) { return '<li>' + escapeHtml(r) + '</li>'; }).join('') + '</ul>' +
+        '<div class="detail-grid">' +
+        '<div><div class="kv-label">Entity type</div><div class="kv-value">' + d.entity + '</div></div>' +
+        '<div><div class="kv-label">Lodgement</div><div class="kv-value">' + d.lodgementType + '</div></div>' +
+        '<div><div class="kv-label">Due</div><div class="kv-value">' + dueLabel + '</div></div>' +
+        '<div><div class="kv-label">Docs received</div><div class="kv-value">' + d.docPct + '%</div></div>' +
+        '<div><div class="kv-label">Risk score</div><div class="kv-value">' + d.riskScore + ' / 100</div></div>' +
+        '</div>' +
+        aiHtml +
+        '</div>' +
+        '</td></tr>';
+    });
+    tbody.innerHTML = html;
+
+    Array.prototype.forEach.call(tbody.querySelectorAll("tr.data-row"), function (row) {
+      row.addEventListener("click", function () {
+        var id = parseInt(row.getAttribute("data-id"), 10);
+        state.expandedId = (state.expandedId === id) ? null : id;
+        render();
+      });
+    });
+
+    Array.prototype.forEach.call(tbody.querySelectorAll(".ai-assist-btn"), function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var id = parseInt(btn.getAttribute("data-id"), 10);
+        aiState[id] = { status: "thinking" };
+        render();
+        var delay = 600 + Math.round(Math.random() * 300);
+        setTimeout(function () {
+          var client = DATA[id];
+          aiState[id] = { status: "done", text: generateAINote(client) };
+          render();
+        }, delay);
+      });
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function updateHeaderIndicators() {
+    Array.prototype.forEach.call(headers, function (th) {
+      th.classList.toggle("sorted", th.getAttribute("data-key") === state.sortKey);
+      var arrow = th.querySelector(".arrow");
+      if (th.getAttribute("data-key") === state.sortKey) {
+        arrow.textContent = state.sortDir === "asc" ? "▲" : "▼";
+      } else {
+        arrow.textContent = "▲▼";
+      }
+    });
+  }
+
+  Array.prototype.forEach.call(headers, function (th) {
+    th.addEventListener("click", function () {
+      var key = th.getAttribute("data-key");
+      if (state.sortKey === key) {
+        state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+      } else {
+        state.sortKey = key;
+        state.sortDir = "desc";
+      }
+      updateHeaderIndicators();
+      render();
+    });
+  });
+
+  filterPills.addEventListener("click", function (e) {
+    var btn = e.target.closest(".pill");
+    if (!btn) return;
+    Array.prototype.forEach.call(filterPills.querySelectorAll(".pill"), function (p) {
+      p.classList.remove("active");
+    });
+    btn.classList.add("active");
+    state.tierFilter = btn.getAttribute("data-tier");
+    render();
+  });
+
+  searchInput.addEventListener("input", function () {
+    state.search = searchInput.value;
+    render();
+  });
+
+  updateHeaderIndicators();
+  render();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Trust & Structuring Growth Options: AXIS Partners</title>
+<style>
+  :root {
+    --navy:#1a2b45; --green:#0d7a5f; --light-green:#e8f5f1; --gold:#c9a84c; --cream:#f8f9fb; --border:#e2e8f0; --muted:#6b7280;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background: var(--cream);
+    color: #1f2937;
+  }
+  .ui, button, input, select, label, .pill, nav {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  h2 {
+    font-size: 20px;
+    margin: 0 0 6px;
+    color: var(--navy);
+  }
+  .subtext {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 20px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--green);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .preset-btn {
+    background: var(--light-green);
+    color: var(--green);
+    border: 1px solid var(--green);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .preset-btn:hover {
+    background: var(--green);
+    color: #fff;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 18px 20px;
+  }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .field select,
+  .field input[type="number"],
+  .field input[type="text"] {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: #fff;
+    color: #1f2937;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .field select:focus,
+  .field input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(13,122,95,0.12);
+  }
+  .radio-row {
+    display: flex;
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .radio-row label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #1f2937;
+    cursor: pointer;
+  }
+  .sub-field {
+    margin-top: 10px;
+    display: none;
+  }
+  .sub-field.show { display: block; }
+
+  .results-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .results-count {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .option-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--green);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    padding: 20px 22px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .option-card.medium { border-left-color: var(--gold); }
+  .option-main { flex: 1 1 380px; }
+  .option-title {
+    font-size: 17px;
+    font-weight: bold;
+    color: var(--navy);
+    margin: 0 0 6px;
+  }
+  .option-rationale {
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: #374151;
+    margin: 0;
+  }
+  .option-side {
+    flex: 0 0 160px;
+    text-align: right;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .fit-pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+  .fit-high { background: var(--light-green); color: var(--green); }
+  .fit-medium { background: #fbf3e2; color: #9c7a1f; }
+  .score-bar-track {
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 4px;
+  }
+  .fit-medium ~ .score-bar-track .score-bar-fill,
+  .option-card.medium .score-bar-fill { background: var(--gold); }
+
+  .empty-state {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+    padding: 30px 10px;
+  }
+
+  .ai-assist-wrap {
+    margin: 4px 0 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .ai-assist-btn {
+    background: var(--navy);
+    color: #fff;
+    border: 1px solid var(--navy);
+    border-radius: 20px;
+    padding: 9px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .ai-assist-btn:hover { background: #243b5e; }
+  .ai-assist-btn:disabled { opacity: 0.65; cursor: default; }
+  .ai-thinking {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 16px;
+  }
+  .ai-spinner {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+    border: 2px solid var(--border);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: ai-spin 0.7s linear infinite;
+  }
+  @keyframes ai-spin {
+    to { transform: rotate(360deg); }
+  }
+  .ai-brief {
+    margin-top: 16px;
+    background: var(--light-green);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--green);
+    border-radius: 10px;
+    padding: 20px 22px;
+  }
+  .ai-brief-label {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 10px;
+  }
+  .ai-brief p {
+    font-family: Georgia, serif;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: #374151;
+    margin: 0 0 12px;
+  }
+  .ai-brief p:last-child { margin-bottom: 0; }
+
+  .disclaimer {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--light-green);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 640px) {
+    header > div { text-align: left !important; }
+    .option-side { text-align: left; flex-basis: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header style="background:linear-gradient(135deg, var(--navy) 0%, #243b5e 100%); color:white; padding:28px 40px;">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; max-width:1100px; margin:0 auto;">
+    <a href="https://www.axispartners.com.au/" target="_blank" rel="noopener">
+      <img src="./axis-logo.png" alt="AXIS Partners" style="height:38px; filter:brightness(0) invert(1);">
+    </a>
+    <div style="text-align:right;">
+      <div style="display:inline-block; background:var(--green); color:white; font-family:'Helvetica Neue',Arial,sans-serif; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:4px 12px; border-radius:20px; margin-bottom:8px;">Bokkas &middot; AI Prototype</div>
+      <h1 style="margin:0; font-size:22px;">Family Trust &amp; Structuring Growth Options</h1>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="card">
+    <h2>Client Situation</h2>
+    <p class="subtext">Fill in the fields below, or click a preset scenario to auto-fill. Results update live as you change any field, this is how the tool would flag proactive structuring conversations during a client review.</p>
+
+    <div class="presets">
+      <button type="button" class="preset-btn" data-preset="tradie">Growing Tradie Business</button>
+      <button type="button" class="preset-btn" data-preset="twoincome">Two-Income Family, One Rental</button>
+      <button type="button" class="preset-btn" data-preset="sale">Approaching Business Sale</button>
+    </div>
+
+    <form id="clientForm" class="form-grid" autocomplete="off">
+      <div class="field">
+        <label for="entity">Current Entity Structure</label>
+        <select id="entity" name="entity">
+          <option value="none">None / Individual only</option>
+          <option value="sole">Sole Trader</option>
+          <option value="company">Company</option>
+          <option value="trust">Family Trust</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="income">Annual Household Income Band</label>
+        <select id="income" name="income">
+          <option value="u90">Under $90k</option>
+          <option value="90-180">$90k to $180k</option>
+          <option value="180-300" selected>$180k to $300k</option>
+          <option value="300-500">$300k to $500k</option>
+          <option value="500plus">$500k+</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Has a Business?</label>
+        <div class="radio-row">
+          <label><input type="radio" name="hasBusiness" value="yes" checked> Yes</label>
+          <label><input type="radio" name="hasBusiness" value="no"> No</label>
+        </div>
+        <div class="sub-field show" id="revenueField">
+          <label for="revenue" style="margin-top:8px;">Rough Annual Revenue</label>
+          <select id="revenue" name="revenue">
+            <option value="u200">Under $200k</option>
+            <option value="200-500" selected>$200k to $500k</option>
+            <option value="500-1m">$500k to $1m</option>
+            <option value="1mplus">$1m+</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="dependents">Number of Dependents</label>
+        <select id="dependents" name="dependents">
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+          <option value="4plus">4+</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Owns Investment Property?</label>
+        <div class="radio-row">
+          <label><input type="radio" name="ownsProperty" value="yes"> Yes</label>
+          <label><input type="radio" name="ownsProperty" value="no" checked> No</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Considering a Property Purchase?</label>
+        <div class="radio-row">
+          <label><input type="radio" name="consideringProperty" value="yes" checked> Yes</label>
+          <label><input type="radio" name="consideringProperty" value="no"> No</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="succession">Business Succession Horizon</label>
+        <select id="succession" name="succession">
+          <option value="na" selected>N/A</option>
+          <option value="5-10">5 to 10 years</option>
+          <option value="lt5">Less than 5 years</option>
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="results-header">
+      <h2 style="margin:0;">Suggested Structuring Options</h2>
+      <span class="results-count" id="resultsCount"></span>
+    </div>
+    <div id="results"></div>
+    <div class="ai-assist-wrap" id="aiAssistWrap" style="display:none;">
+      <button type="button" class="ai-assist-btn" id="aiAssistBtn">AI: Draft Client Brief</button>
+      <div id="aiAssistOutput"></div>
+    </div>
+    <div class="disclaimer">
+      Illustrative logic only. This prototype uses simplified, fixed if/else rules for demonstration purposes and is not real tax or legal advice. Any actual recommendation must be made by an AXIS Partners adviser based on a full review of the client's circumstances.
+    </div>
+  </div>
+
+</main>
+
+<footer style="text-align:center; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); padding:24px; border-top:1px solid var(--border); margin-top:40px;">
+  Prototype built by Bokkas for AXIS Partners &middot; illustrative logic only, not real tax/legal advice, not connected to any live system &middot; <a href="https://www.axispartners.com.au/" target="_blank" rel="noopener" style="color:var(--green);">axispartners.com.au</a>
+</footer>
+
+<script>
+(function () {
+  var form = document.getElementById('clientForm');
+  var resultsEl = document.getElementById('results');
+  var countEl = document.getElementById('resultsCount');
+  var revenueField = document.getElementById('revenueField');
+  var aiAssistWrap = document.getElementById('aiAssistWrap');
+  var aiAssistBtn = document.getElementById('aiAssistBtn');
+  var aiAssistOutput = document.getElementById('aiAssistOutput');
+  var currentInputs = null;
+  var currentOpts = [];
+
+  var presets = {
+    tradie: {
+      entity: 'sole',
+      income: '90-180',
+      hasBusiness: 'yes',
+      revenue: '200-500',
+      dependents: '2',
+      ownsProperty: 'no',
+      consideringProperty: 'no',
+      succession: 'na'
+    },
+    twoincome: {
+      entity: 'none',
+      income: '180-300',
+      hasBusiness: 'no',
+      revenue: '200-500',
+      dependents: '2',
+      ownsProperty: 'yes',
+      consideringProperty: 'no',
+      succession: 'na'
+    },
+    sale: {
+      entity: 'trust',
+      income: '300-500',
+      hasBusiness: 'yes',
+      revenue: '1mplus',
+      dependents: '3',
+      ownsProperty: 'yes',
+      consideringProperty: 'no',
+      succession: 'lt5'
+    }
+  };
+
+  function applyPreset(name) {
+    var p = presets[name];
+    if (!p) return;
+    document.getElementById('entity').value = p.entity;
+    document.getElementById('income').value = p.income;
+    document.getElementById('dependents').value = p.dependents;
+    document.getElementById('succession').value = p.succession;
+    document.getElementById('revenue').value = p.revenue;
+
+    setRadio('hasBusiness', p.hasBusiness);
+    setRadio('ownsProperty', p.ownsProperty);
+    setRadio('consideringProperty', p.consideringProperty);
+
+    toggleRevenueField();
+    evaluate();
+  }
+
+  function setRadio(name, value) {
+    var radios = form.querySelectorAll('input[name="' + name + '"]');
+    radios.forEach(function (r) { r.checked = (r.value === value); });
+  }
+
+  function getRadio(name) {
+    var el = form.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : null;
+  }
+
+  function toggleRevenueField() {
+    var hasBiz = getRadio('hasBusiness');
+    if (hasBiz === 'yes') {
+      revenueField.classList.add('show');
+    } else {
+      revenueField.classList.remove('show');
+    }
+  }
+
+  // ---- Knowledge bank + rules ----
+  // Each rule returns {key, title, rationale, score (0-100)} or null.
+  function buildOptions(inputs) {
+    var opts = [];
+
+    var incomeRank = { u90: 0, '90-180': 1, '180-300': 2, '300-500': 3, '500plus': 4 };
+    var incomeVal = incomeRank[inputs.income];
+
+    // 1. Discretionary Family Trust for income splitting
+    if (inputs.entity !== 'trust') {
+      var score = 0;
+      var reasons = [];
+      if (incomeVal >= 2) { score += 35; reasons.push('household income is high enough that splitting between family members would meaningfully reduce the overall tax rate'); }
+      if (inputs.hasBusiness === 'yes') { score += 30; reasons.push('trading through a discretionary trust lets business profit be distributed across lower-income family members each year'); }
+      if (inputs.dependents !== '0') { score += 15; }
+      if (score > 0) {
+        opts.push({
+          key: 'discTrust',
+          title: 'Discretionary Family Trust for Income Splitting',
+          rationale: 'With ' + (inputs.hasBusiness === 'yes' ? 'business income' : 'household income') + ' in this range and ' + (inputs.dependents === '0' ? 'no' : inputs.dependents) + ' dependent(s) on record, distributing income across family members each year through a discretionary trust could reduce the household\'s overall effective tax rate versus holding everything in one name.',
+          score: Math.min(score, 95)
+        });
+      }
+    }
+
+    // 2. Corporate trustee for asset protection
+    if (inputs.hasBusiness === 'yes' || inputs.ownsProperty === 'yes' || inputs.consideringProperty === 'yes') {
+      var score2 = 0;
+      if (inputs.hasBusiness === 'yes') score2 += 35;
+      if (inputs.ownsProperty === 'yes') score2 += 25;
+      if (inputs.consideringProperty === 'yes') score2 += 20;
+      if (inputs.entity === 'sole') score2 += 15;
+      opts.push({
+        key: 'corpTrustee',
+        title: 'Corporate Trustee for Asset Protection',
+        rationale: 'Running ' + (inputs.hasBusiness === 'yes' ? 'a trading business' : 'investment property') + (inputs.entity === 'sole' ? ' as a sole trader leaves personal assets exposed' : '') + '. A corporate trustee (rather than an individual trustee) ring-fences trust and personal assets from business or investment liability.',
+        score: Math.min(score2, 90)
+      });
+    }
+
+    // 3. Bucket company alongside trust to cap tax at company rate
+    if (inputs.hasBusiness === 'yes' && (inputs.revenue === '500-1m' || inputs.revenue === '1mplus') && incomeVal >= 2) {
+      opts.push({
+        key: 'bucketCo',
+        title: 'Bucket Company Alongside Trust',
+        rationale: 'At this revenue level, trust profit left undistributed to individuals can be capped at the company tax rate by streaming a portion to a corporate "bucket company" beneficiary, rather than pushing it all into higher personal marginal rates.',
+        score: inputs.revenue === '1mplus' ? 88 : 70
+      });
+    }
+
+    // 4. Div 7A loan agreement review
+    if (inputs.entity === 'company' || (inputs.hasBusiness === 'yes' && (inputs.revenue === '500-1m' || inputs.revenue === '1mplus'))) {
+      opts.push({
+        key: 'div7a',
+        title: 'Div 7A Loan Agreement Review',
+        rationale: 'Where a company (existing or a future bucket company) pays money to, or on behalf of, shareholders or associates, an unreviewed or missing Div 7A loan agreement risks the amount being treated as an unfranked dividend. Worth a proactive check as profit and cash movements grow.',
+        score: 65
+      });
+    }
+
+    // 5. SMSF as part of structure
+    if (incomeVal >= 3 && (inputs.hasBusiness === 'yes' || inputs.ownsProperty === 'yes' || inputs.consideringProperty === 'yes')) {
+      opts.push({
+        key: 'smsf',
+        title: 'SMSF as Part of the Structure',
+        rationale: 'Higher household income combined with ' + (inputs.hasBusiness === 'yes' ? 'business assets' : 'a property focus') + ' makes an SMSF worth a look, particularly for holding business real property or diversifying outside the family trust with concessional tax treatment on earnings.',
+        score: incomeVal === 4 ? 60 : 45
+      });
+    }
+
+    // 6. Testamentary trust considerations
+    if (inputs.dependents !== '0' && (inputs.ownsProperty === 'yes' || incomeVal >= 3 || inputs.entity === 'trust')) {
+      opts.push({
+        key: 'testamentary',
+        title: 'Testamentary Trust Considerations',
+        rationale: 'With ' + inputs.dependents + ' dependent(s) and growing family assets, building testamentary trust provisions into estate planning now protects wealth transferred to the next generation and preserves income-splitting benefits after an inheritance.',
+        score: 40
+      });
+    }
+
+    // 7. Succession / sale structuring
+    if (inputs.succession === 'lt5' || inputs.succession === '5-10') {
+      opts.push({
+        key: 'succession',
+        title: 'Pre-Sale / Succession Structuring Review',
+        rationale: inputs.succession === 'lt5'
+          ? 'A sale or exit within 5 years is a hard deadline to review eligibility for the small business CGT concessions and to confirm the trust and company structure will support a clean, tax-effective exit.'
+          : 'A 5-10 year succession horizon gives time to restructure now (rather than under time pressure later) so that CGT concessions, trust distributions and any earnout are set up cleanly ahead of a sale or handover.',
+        score: inputs.succession === 'lt5' ? 92 : 68
+      });
+    }
+
+    // 8. Property-purchase specific structuring note
+    if (inputs.consideringProperty === 'yes') {
+      opts.push({
+        key: 'propertyEntity',
+        title: 'Entity Choice for the New Property Purchase',
+        rationale: 'Before the next property purchase settles, it is worth confirming whether it should sit in the existing family trust, a new trust, or personal names, since this affects land tax grouping, negative gearing usefulness, and future CGT discount eligibility.',
+        score: 58
+      });
+    }
+
+    // Sort by score desc, cap 2-5
+    opts.sort(function (a, b) { return b.score - a.score; });
+    if (opts.length > 5) opts = opts.slice(0, 5);
+    return opts;
+  }
+
+  // ---- AI assist: plain-English client brief, templated from inputs + surfaced options ----
+  function phraseEntity(entity) {
+    if (entity === 'sole') return 'trading as a sole trader';
+    if (entity === 'company') return 'operating through a company';
+    if (entity === 'trust') return 'already using a family trust';
+    return 'set up as an individual, with no company or trust in place yet';
+  }
+
+  function phraseIncome(income) {
+    if (income === 'u90') return 'under $90k';
+    if (income === '90-180') return 'between $90k and $180k';
+    if (income === '180-300') return 'between $180k and $300k';
+    if (income === '300-500') return 'between $300k and $500k';
+    if (income === '500plus') return 'over $500k';
+    return 'in the range provided';
+  }
+
+  function phraseRevenue(revenue) {
+    if (revenue === 'u200') return 'under $200k';
+    if (revenue === '200-500') return 'between $200k and $500k';
+    if (revenue === '500-1m') return 'between $500k and $1m';
+    if (revenue === '1mplus') return 'over $1m';
+    return 'in the range provided';
+  }
+
+  function phraseDependents(dependents) {
+    if (dependents === '0') return 'no dependents';
+    if (dependents === '4plus') return '4 or more dependents';
+    return dependents + (dependents === '1' ? ' dependent' : ' dependents');
+  }
+
+  function phraseSuccession(succession) {
+    if (succession === 'lt5') return 'a business sale or handover expected inside the next 5 years';
+    if (succession === '5-10') return 'a business sale or succession expected in around 5 to 10 years';
+    return '';
+  }
+
+  function reasonForOption(key, inputs) {
+    if (key === 'discTrust') {
+      return 'Distributing income across the family each year through a discretionary trust, rather than earning it all in one name, can lower the household\'s overall tax rate, particularly with ' + phraseDependents(inputs.dependents) + ' who could be included as beneficiaries.';
+    }
+    if (key === 'corpTrustee') {
+      return 'Putting a company in place as trustee, rather than an individual, means a claim against the business or an investment property cannot reach straight through to personal assets.';
+    }
+    if (key === 'bucketCo') {
+      return 'At revenue ' + phraseRevenue(inputs.revenue) + ', a bucket company can catch trust profit that would otherwise land on higher personal tax rates and cap it at the company tax rate instead.';
+    }
+    if (key === 'div7a') {
+      return 'Any payments or loans moving between a company and its shareholders need a properly documented Div 7A loan agreement in place, otherwise the ATO can treat the amount as an unfranked dividend.';
+    }
+    if (key === 'smsf') {
+      return 'At this income level, a self-managed super fund alongside the existing structure is worth considering, particularly for holding business property or spreading assets outside the trust with concessional tax treatment.';
+    }
+    if (key === 'testamentary') {
+      return 'With ' + phraseDependents(inputs.dependents) + ' to plan for, adding testamentary trust terms to the will now protects how wealth passes to the next generation and keeps the income-splitting benefit going after an inheritance.';
+    }
+    if (key === 'succession') {
+      return inputs.succession === 'lt5'
+        ? 'With a sale or handover likely inside 5 years, now is the time to confirm eligibility for the small business CGT concessions and make sure the structure supports a clean exit.'
+        : 'A 5 to 10 year horizon leaves time to line up CGT concessions, trust distributions and any structure changes well ahead of a sale, rather than sorting it out under time pressure later.';
+    }
+    if (key === 'propertyEntity') {
+      return 'Deciding upfront whether the new property sits in the existing trust, a new trust, or personal names affects land tax grouping, negative gearing usefulness, and the CGT discount down the track.';
+    }
+    return '';
+  }
+
+  function generateBrief(inputs, opts) {
+    var para1 = 'You are ' + phraseEntity(inputs.entity) + ', with household income ' + phraseIncome(inputs.income);
+    if (inputs.hasBusiness === 'yes') {
+      para1 += ' and the business turning over ' + phraseRevenue(inputs.revenue) + ' a year';
+    }
+    para1 += ', and ' + phraseDependents(inputs.dependents) + ' to plan around.';
+
+    if (inputs.ownsProperty === 'yes' && inputs.consideringProperty === 'yes') {
+      para1 += ' You already hold an investment property and are also weighing up another purchase.';
+    } else if (inputs.ownsProperty === 'yes') {
+      para1 += ' You already hold an investment property.';
+    } else if (inputs.consideringProperty === 'yes') {
+      para1 += ' You are also weighing up a new property purchase.';
+    }
+
+    var successionPhrase = phraseSuccession(inputs.succession);
+    if (successionPhrase) {
+      para1 += ' On top of that, there is ' + successionPhrase + '.';
+    }
+
+    var reasons = [];
+    opts.forEach(function (o) {
+      var r = reasonForOption(o.key, inputs);
+      if (r) reasons.push(o.title + '. ' + r);
+    });
+
+    var para2 = 'Based on this, ' + opts.length + ' option' + (opts.length === 1 ? '' : 's') + ' stand' + (opts.length === 1 ? 's' : '') + ' out as worth a conversation. ' + reasons.join(' ');
+
+    var para3 = 'None of this is final advice, think of it as a starting point for the next meeting. Your AXIS Partners adviser will confirm the right structure once they have reviewed the full picture.';
+
+    return [para1, para2, para3];
+  }
+
+  function resetAiAssist(hasOptions) {
+    aiAssistOutput.innerHTML = '';
+    aiAssistBtn.disabled = false;
+    aiAssistBtn.textContent = 'AI: Draft Client Brief';
+    aiAssistWrap.style.display = hasOptions ? 'block' : 'none';
+  }
+
+  function renderAiBrief(paras) {
+    var html = '<div class="ai-brief"><div class="ai-brief-label">Draft Client Brief</div>';
+    paras.forEach(function (p) {
+      html += '<p>' + p + '</p>';
+    });
+    html += '</div>';
+    aiAssistOutput.innerHTML = html;
+  }
+
+  function render(opts) {
+    resultsEl.innerHTML = '';
+    if (!opts.length) {
+      resultsEl.innerHTML = '<div class="empty-state">No structuring flags for this combination yet. Try enabling a business, property, or adjusting income band.</div>';
+      countEl.textContent = '';
+      return;
+    }
+    countEl.textContent = opts.length + ' option' + (opts.length === 1 ? '' : 's') + ' surfaced';
+
+    opts.forEach(function (o) {
+      var fitLabel, fitClass, cardClass;
+      if (o.score >= 70) { fitLabel = 'High Fit'; fitClass = 'fit-high'; cardClass = ''; }
+      else { fitLabel = 'Medium Fit'; fitClass = 'fit-medium'; cardClass = 'medium'; }
+
+      var card = document.createElement('div');
+      card.className = 'option-card' + (cardClass ? ' ' + cardClass : '');
+      card.innerHTML =
+        '<div class="option-main">' +
+          '<div class="option-title">' + o.title + '</div>' +
+          '<p class="option-rationale">' + o.rationale + '</p>' +
+        '</div>' +
+        '<div class="option-side">' +
+          '<span class="fit-pill ' + fitClass + '">' + fitLabel + '</span>' +
+          '<div class="score-bar-track"><div class="score-bar-fill" style="width:' + o.score + '%;"></div></div>' +
+        '</div>';
+      resultsEl.appendChild(card);
+    });
+  }
+
+  function evaluate() {
+    var inputs = {
+      entity: document.getElementById('entity').value,
+      income: document.getElementById('income').value,
+      hasBusiness: getRadio('hasBusiness'),
+      revenue: document.getElementById('revenue').value,
+      dependents: document.getElementById('dependents').value,
+      ownsProperty: getRadio('ownsProperty'),
+      consideringProperty: getRadio('consideringProperty'),
+      succession: document.getElementById('succession').value
+    };
+    var opts = buildOptions(inputs);
+    currentInputs = inputs;
+    currentOpts = opts;
+    render(opts);
+    resetAiAssist(opts.length > 0);
+  }
+
+  // Wire up live updates
+  form.addEventListener('input', function (e) {
+    if (e.target.name === 'hasBusiness') toggleRevenueField();
+    evaluate();
+  });
+  form.addEventListener('change', function (e) {
+    if (e.target.name === 'hasBusiness') toggleRevenueField();
+    evaluate();
+  });
+
+  document.querySelectorAll('.preset-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      applyPreset(btn.getAttribute('data-preset'));
+    });
+  });
+
+  aiAssistBtn.addEventListener('click', function () {
+    if (!currentOpts.length) return;
+    var inputsSnapshot = currentInputs;
+    var optsSnapshot = currentOpts;
+
+    aiAssistBtn.disabled = true;
+    aiAssistBtn.textContent = 'Thinking...';
+    aiAssistOutput.innerHTML = '<div class="ai-thinking"><span class="ai-spinner"></span><span>Drafting a client-ready summary...</span></div>';
+
+    var delay = 600 + Math.floor(Math.random() * 300);
+    setTimeout(function () {
+      renderAiBrief(generateBrief(inputsSnapshot, optsSnapshot));
+      aiAssistBtn.disabled = false;
+      aiAssistBtn.textContent = 'AI: Regenerate Client Brief';
+    }, delay);
+  });
+
+  // Initial render
+  toggleRevenueField();
+  evaluate();
+})();
+</script>
+
+</body>
+</html>

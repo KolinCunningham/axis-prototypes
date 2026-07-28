@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cashflow Gap &amp; Upsell Timing: AXIS Partners</title>
+<style>
+  :root {
+    --navy:#1a2b45;
+    --green:#0d7a5f;
+    --light-green:#e8f5f1;
+    --gold:#c9a84c;
+    --cream:#f8f9fb;
+    --border:#e2e8f0;
+    --muted:#6b7280;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; }
+  body {
+    font-family: Georgia, serif;
+    background: var(--cream);
+    color: #1f2937;
+    line-height: 1.5;
+  }
+  .sans { font-family:'Helvetica Neue', Arial, sans-serif; }
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  .intro {
+    margin: 0 0 28px;
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 760px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--green);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    padding: 22px 24px;
+  }
+  h2.section-title {
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin: 0 0 4px;
+  }
+  .section-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 18px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+  }
+
+  /* ---- Summary / ranking table ---- */
+  .radar-card { margin-bottom: 28px; }
+  table.radar {
+    width: 100%;
+    border-collapse: collapse;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 13.5px;
+  }
+  table.radar th {
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  table.radar td {
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  table.radar tbody tr {
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+  table.radar tbody tr:hover { background: var(--light-green); }
+  table.radar tbody tr.active {
+    background: var(--light-green);
+    box-shadow: inset 3px 0 0 var(--green);
+  }
+  table.radar tbody tr:last-child td { border-bottom: none; }
+  .rank-num {
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-weight: 700;
+    color: var(--navy);
+    width: 24px;
+    display: inline-block;
+  }
+  .client-name { font-weight: 700; color: var(--navy); font-family: Georgia, serif; font-size: 14.5px; }
+  .client-industry { color: var(--muted); font-size: 12px; }
+  .signal-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .signal-dip { background: #fdeee0; color: #a15c1e; }
+  .signal-buildup { background: var(--light-green); color: var(--green); }
+  .signal-none { background: #f1f2f4; color: var(--muted); }
+  .score-track {
+    width: 100px;
+    height: 7px;
+    background: var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .score-fill { height: 100%; border-radius: 5px; background: var(--gold); }
+  .score-fill.buildup { background: var(--green); }
+  .impact-val { font-family:'Helvetica Neue', Arial, sans-serif; font-weight: 700; }
+  .contacted-badge {
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 0.3px;
+  }
+
+  /* ---- Detail section ---- */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 760px) {
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+  .chart-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 6px;
+  }
+  select#clientPicker {
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--navy);
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--cream);
+    cursor: pointer;
+    min-width: 240px;
+  }
+  .client-meta { font-size: 12.5px; color: var(--muted); font-family:'Helvetica Neue', Arial, sans-serif; margin-top: 2px;}
+
+  .chart-legend {
+    display: flex;
+    gap: 16px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    margin: 10px 0 4px;
+  }
+  .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+  .swatch.green { background: var(--green); }
+  .swatch.gold { background: var(--gold); }
+
+  .chart-wrap { position: relative; }
+  svg#chart { width: 100%; height: auto; display: block; }
+  .bar { cursor: pointer; }
+  .gridline { stroke: var(--border); stroke-width: 1; }
+  .axis-label { font-family:'Helvetica Neue', Arial, sans-serif; font-size: 10.5px; fill: var(--muted); }
+  .callout-label { font-family:'Helvetica Neue', Arial, sans-serif; font-size: 11px; font-weight: 700; fill: #a15c1e; }
+  .callout-label.buildup { fill: var(--green); }
+
+  #tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--navy);
+    color: #fff;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    line-height: 1.4;
+    transform: translate(-50%, -110%);
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    white-space: nowrap;
+    z-index: 5;
+  }
+  #tooltip.show { opacity: 1; }
+  #tooltip .tt-val { font-weight: 700; }
+
+  .table-toggle {
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    color: var(--green);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 10px;
+    text-decoration: underline;
+  }
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 12.5px;
+    margin-top: 12px;
+    display: none;
+  }
+  table.data-table.show { display: table; }
+  table.data-table th {
+    text-align: right;
+    color: var(--muted);
+    font-weight: 700;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 10.5px;
+    text-transform: uppercase;
+  }
+  table.data-table th:first-child, table.data-table td:first-child { text-align: left; }
+  table.data-table td {
+    text-align: right;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  table.data-table tr.flagged td { background: #fdf6e6; }
+
+  /* ---- Upsell panel ---- */
+  .upsell-card { border-left-color: var(--gold); }
+  .upsell-card.no-signal { border-left-color: var(--border); }
+  .upsell-tag {
+    display: inline-block;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .upsell-tag.dip { background: #fdeee0; color: #a15c1e; }
+  .upsell-tag.buildup { background: var(--light-green); color: var(--green); }
+  .upsell-tag.none { background: #f1f2f4; color: var(--muted); }
+  .upsell-trigger {
+    font-size: 15px;
+    margin: 0 0 16px;
+    color: #1f2937;
+  }
+  .upsell-suggest-label {
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin: 0 0 6px;
+  }
+  .upsell-suggest {
+    font-size: 14.5px;
+    color: #374151;
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    background: var(--light-green);
+    border-radius: 8px;
+  }
+  .upsell-suggest.plain { background: #f1f2f4; }
+  button.log-btn {
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--navy);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button.log-btn.logged { background: var(--green); }
+  button.log-btn:disabled { cursor: default; }
+
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  button.ai-btn {
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--navy);
+    background: #fff;
+    border: 1px solid var(--navy);
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button.ai-btn:hover { background: var(--cream); }
+  button.ai-btn:disabled { cursor: default; opacity: 0.65; }
+
+  .ai-output:empty { margin: 0; }
+  .ai-output { margin-top: 14px; }
+
+  .ai-thinking {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .ai-dots { display: inline-flex; gap: 4px; }
+  .ai-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: inline-block;
+    animation: aiPulse 1s ease-in-out infinite;
+  }
+  .ai-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .ai-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes aiPulse {
+    0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+
+  .ai-script-label {
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin: 0 0 6px;
+  }
+  .ai-script {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 14px;
+    color: #374151;
+    margin: 0;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px dashed var(--gold);
+    border-radius: 8px;
+    line-height: 1.55;
+  }
+</style>
+</head>
+<body>
+
+<header style="background:linear-gradient(135deg, var(--navy) 0%, #243b5e 100%); color:white; padding:28px 40px;">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; max-width:1100px; margin:0 auto;">
+    <a href="https://www.axispartners.com.au/" target="_blank" rel="noopener">
+      <img src="./axis-logo.png" alt="AXIS Partners" style="height:38px; filter:brightness(0) invert(1);">
+    </a>
+    <div style="text-align:right;">
+      <div style="display:inline-block; background:var(--green); color:white; font-family:'Helvetica Neue',Arial,sans-serif; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:4px 12px; border-radius:20px; margin-bottom:8px;">Bokkas &middot; AI Prototype</div>
+      <h1 style="margin:0; font-size:22px;">Cashflow Gap &amp; Upsell Timing</h1>
+    </div>
+  </div>
+</header>
+
+<main>
+  <p class="intro">Mock monthly net cashflow for 10 client businesses, monitored continuously (simulated here). When a client's cashflow opens up a gap, a lull between jobs, a seasonal dip, or an unexpected buildup with no capex behind it, that's the moment to call, rather than waiting for the annual review. Detection below is simple rolling-average threshold logic, for demonstration only.</p>
+
+  <div class="card radar-card">
+    <h2 class="section-title">Upsell radar: who's worth a call this week</h2>
+    <p class="section-sub">All clients ranked by opportunity score. Click a row to see the detail.</p>
+    <table class="radar">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Client</th>
+          <th>Signal</th>
+          <th>Est. impact</th>
+          <th>Opportunity</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="radarBody"></tbody>
+    </table>
+  </div>
+
+  <div class="detail-grid">
+    <div class="card">
+      <div class="chart-card-header">
+        <div>
+          <label for="clientPicker" class="sans" style="display:block; font-size:11px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Client</label>
+          <select id="clientPicker" class="sans"></select>
+          <div class="client-meta" id="clientMeta"></div>
+        </div>
+      </div>
+
+      <div class="chart-legend">
+        <span><i class="swatch green"></i>Normal month</span>
+        <span><i class="swatch gold"></i>Flagged: upsell window</span>
+      </div>
+
+      <div class="chart-wrap">
+        <svg id="chart" viewBox="0 0 860 340" preserveAspectRatio="xMidYMid meet"></svg>
+        <div id="tooltip"></div>
+      </div>
+
+      <button class="table-toggle" id="tableToggle">Show as table</button>
+      <table class="data-table" id="dataTable">
+        <thead><tr><th>Month</th><th>Net cashflow</th></tr></thead>
+        <tbody id="dataTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="card upsell-card" id="upsellCard">
+      <h2 class="section-title">Upsell moment</h2>
+      <div id="upsellTagWrap"></div>
+      <p class="upsell-trigger" id="upsellTrigger"></p>
+      <p class="upsell-suggest-label">Suggested talking point</p>
+      <p class="upsell-suggest" id="upsellSuggest"></p>
+      <div class="btn-row">
+        <button class="log-btn" id="logBtn">Mark as contacted this week</button>
+        <button class="ai-btn" id="aiBtn">AI: draft talking points</button>
+      </div>
+      <div class="ai-output" id="aiOutput"></div>
+    </div>
+  </div>
+</main>
+
+<footer style="text-align:center; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); padding:24px; border-top:1px solid var(--border); margin-top:40px;">
+  Prototype built by Bokkas for AXIS Partners &middot; all client data shown is fictional/mock, not connected to any live system &middot; <a href="https://www.axispartners.com.au/" target="_blank" rel="noopener" style="color:var(--green);">axispartners.com.au</a>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var MONTHS = ["Aug '25","Sep '25","Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26","Apr '26","May '26","Jun '26","Jul '26"];
+
+  // ---- Mock client data: 12 months net cashflow (AUD) ----
+  var CLIENTS = [
+    {
+      id: "bluegum", name: "Blue Gum Electrical", industry: "Trades: Electrical",
+      monthly: [30000,29000,31000,33000,38000,36000,15000,13000,34000,35000,33000,32000],
+      note: "quiet stretch after the summer job pipeline wrapped up",
+      dipSuggest: "Quiet stretch after a strong run of jobs, good time to check in before it becomes a stress point. Worth reviewing job-pipeline financing and whether a short-term facility would smooth the gap between contracts."
+    },
+    {
+      id: "harbourside", name: "Harbourside Plumbing & Gas", industry: "Trades: Plumbing",
+      monthly: [24000,26000,25000,27000,50000,53000,26000,25000,27000,28000,26000,29000],
+      note: "large commercial job paid out with no capex behind it",
+      buildupSuggest: "A lump sum has landed with no capex plan behind it yet, good timing to raise investment or trust/entity structuring advice, or discuss paying down debt ahead of schedule."
+    },
+    {
+      id: "rustyanchor", name: "The Rusty Anchor Hotel", industry: "Hospitality: Pub",
+      monthly: [42000,40000,44000,50000,58000,46000,41000,39000,40000,43000,20000,16000],
+      note: "seasonal winter lull after a strong summer season",
+      dipSuggest: "Seasonal winter lull setting in, good timing to check in before it becomes a stress point. Review the cashflow buffer and staffing costs ahead of the next peak season."
+    },
+    {
+      id: "milkhoney", name: "Milk & Honey Café", industry: "Hospitality: Café",
+      monthly: [18000,17500,18200,19000,20500,19500,17800,17200,18000,18500,17600,18800],
+      note: "steady trading all year, nothing unusual",
+      noSignal: true
+    },
+    {
+      id: "coastaltrends", name: "Coastal Trends Boutique", industry: "Retail: Fashion",
+      monthly: [22000,21000,23000,26000,52000,15000,14000,24000,25000,26000,24000,23000],
+      note: "post-Christmas hangover after the December spike",
+      dipSuggest: "Classic post-Christmas dip after the December spike, good time to check in before Q1 pressure builds. Worth reviewing stock financing and short-term working capital cover."
+    },
+    {
+      id: "northside", name: "Northside Hardware Supplies", industry: "Retail: Hardware",
+      monthly: [25000,26000,24000,25000,27000,26000,25000,26000,48000,50000,27000,26000],
+      note: "buildup after a strong renovation-season trading run",
+      buildupSuggest: "Strong trading buildup off the back of renovation season, good time to talk surplus deployment, equipment upgrade timing, or bringing forward extra super contributions."
+    },
+    {
+      id: "meridian", name: "Meridian Strategy Consulting", industry: "Consulting: Strategy",
+      monthly: [20000,55000,58000,19000,21000,20000,22000,21000,23000,22000,24000,23000],
+      note: "new retainer client landed and paid a large upfront engagement",
+      buildupSuggest: "A new retainer has locked in extra recurring revenue. With income now more predictable, worth discussing entity/trust structuring for the uplift and bringing forward tax planning."
+    },
+    {
+      id: "bondibuild", name: "Bondi Build Co", industry: "Trades: Construction",
+      monthly: [35000,37000,36000,38000,40000,39000,37000,-3000,-1000,36000,38000,37000],
+      note: "gap between projects, cashflow briefly went negative",
+      dipSuggest: "Gap between projects pushed cashflow briefly negative. This is the moment to check in, before it becomes a stress point. Discuss overhead coverage, a bridging facility, or timing the next job's deposit earlier."
+    },
+    {
+      id: "verve", name: "Verve Marketing Collective", industry: "Consulting: Creative/Marketing",
+      monthly: [19000,18000,20000,19500,21000,20000,19000,21000,20000,34000,37000,21000],
+      note: "backlog of unbilled work came through at once",
+      buildupSuggest: "This buildup looks like unbilled WIP catching up all at once, good moment to formalise invoicing cadence and unbilled-work recognition so cashflow visibility matches the ledger."
+    },
+    {
+      id: "kirribilli", name: "Kirribilli Fine Foods", industry: "Retail: Specialty Food",
+      monthly: [16000,15500,16200,17000,19000,18500,16800,16200,16500,17000,16600,16800],
+      note: "steady, mild seasonal bump only",
+      noSignal: true
+    }
+  ];
+
+  var THRESHOLD_PCT = 28; // minimum abs deviation to call it a flagged opportunity
+
+  function detectGap(monthly) {
+    var best = null;
+    for (var i = 0; i < monthly.length - 1; i++) {
+      var windowAvg = (monthly[i] + monthly[i + 1]) / 2;
+      var rest = [];
+      for (var j = 0; j < monthly.length; j++) { if (j !== i && j !== i + 1) rest.push(monthly[j]); }
+      var trailingAvg = rest.reduce(function (a, b) { return a + b; }, 0) / rest.length;
+      var diff = windowAvg - trailingAvg;
+      var pct = trailingAvg !== 0 ? (diff / Math.abs(trailingAvg)) * 100 : 0;
+      if (!best || Math.abs(pct) > Math.abs(best.pct)) {
+        best = { startIdx: i, endIdx: i + 1, windowAvg: windowAvg, trailingAvg: trailingAvg, diff: diff, pct: pct };
+      }
+    }
+    return best;
+  }
+
+  function fmtMoney(v) {
+    var sign = v < 0 ? "-" : "";
+    var abs = Math.round(Math.abs(v));
+    return sign + "$" + abs.toLocaleString("en-AU");
+  }
+  function fmtMoneyK(v) {
+    var sign = v < 0 ? "-" : "";
+    return sign + "$" + Math.round(Math.abs(v) / 1000) + "k";
+  }
+
+  // ---- compute gap + score for every client ----
+  CLIENTS.forEach(function (c) {
+    var gap = detectGap(c.monthly);
+    c.gap = gap;
+    c.flagged = !c.noSignal && Math.abs(gap.pct) >= THRESHOLD_PCT;
+    c.type = gap.diff >= 0 ? "buildup" : "dip";
+    c.score = c.flagged ? Math.min(100, Math.round(Math.abs(gap.pct))) : Math.round(Math.abs(gap.pct) * 0.4);
+    c.contacted = false;
+  });
+  CLIENTS.sort(function (a, b) { return b.score - a.score; });
+
+  var selectedId = CLIENTS[0].id;
+
+  function getClient(id) {
+    for (var i = 0; i < CLIENTS.length; i++) { if (CLIENTS[i].id === id) return CLIENTS[i]; }
+    return CLIENTS[0];
+  }
+
+  // ---- Radar table ----
+  function renderRadar() {
+    var body = document.getElementById("radarBody");
+    body.innerHTML = "";
+    CLIENTS.forEach(function (c, idx) {
+      var tr = document.createElement("tr");
+      tr.className = c.id === selectedId ? "active" : "";
+      tr.setAttribute("data-id", c.id);
+
+      var signalHtml;
+      if (c.flagged) {
+        signalHtml = '<span class="signal-pill ' + (c.type === "dip" ? "signal-dip" : "signal-buildup") + '">' +
+          (c.type === "dip" ? "▼ dip" : "▲ buildup") + '</span>';
+      } else {
+        signalHtml = '<span class="signal-pill signal-none">steady</span>';
+      }
+
+      var fillClass = c.type === "buildup" ? "score-fill buildup" : "score-fill";
+
+      tr.innerHTML =
+        '<td><span class="rank-num">' + (idx + 1) + '</span></td>' +
+        '<td><div class="client-name">' + c.name + (c.contacted ? ' <span class="contacted-badge">✓ contacted</span>' : '') + '</div><div class="client-industry">' + c.industry + '</div></td>' +
+        '<td>' + signalHtml + '</td>' +
+        '<td class="impact-val">' + fmtMoneyK(Math.abs(c.gap.diff * 2)) + '</td>' +
+        '<td><span class="score-track"><span class="' + fillClass + '" style="width:' + c.score + '%"></span></span></td>' +
+        '<td class="sans" style="color:var(--muted); font-size:12px;">' + (idx === 0 ? "call this week" : "") + '</td>';
+
+      tr.addEventListener("click", function () {
+        selectedId = c.id;
+        document.getElementById("clientPicker").value = c.id;
+        renderAll();
+      });
+      body.appendChild(tr);
+    });
+  }
+
+  // ---- Client picker ----
+  function renderPicker() {
+    var picker = document.getElementById("clientPicker");
+    picker.innerHTML = "";
+    CLIENTS.forEach(function (c) {
+      var opt = document.createElement("option");
+      opt.value = c.id;
+      opt.textContent = c.name;
+      picker.appendChild(opt);
+    });
+    picker.value = selectedId;
+    picker.addEventListener("change", function () {
+      selectedId = picker.value;
+      renderAll();
+    });
+  }
+
+  // ---- Chart ----
+  var SVG_NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) {
+    var e = document.createElementNS(SVG_NS, tag);
+    for (var k in attrs) { e.setAttribute(k, attrs[k]); }
+    return e;
+  }
+
+  function renderChart(c) {
+    var svg = document.getElementById("chart");
+    svg.innerHTML = "";
+    var W = 860, H = 340;
+    var padL = 54, padR = 16, padT = 34, padB = 34;
+    var plotW = W - padL - padR;
+    var plotH = H - padT - padB;
+
+    var vals = c.monthly;
+    var minV = Math.min(0, Math.min.apply(null, vals));
+    var maxV = Math.max.apply(null, vals);
+    var range = maxV - minV;
+    var pad = range * 0.12;
+    minV -= pad; maxV += pad;
+    range = maxV - minV;
+
+    function yFor(v) { return padT + plotH - ((v - minV) / range) * plotH; }
+    var zeroY = yFor(0);
+
+    // gridlines (5 horizontal)
+    var steps = 4;
+    for (var s = 0; s <= steps; s++) {
+      var gv = minV + (range * s / steps);
+      var gy = yFor(gv);
+      svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: gy, y2: gy, class: "gridline" }));
+      var lbl = el("text", { x: padL - 8, y: gy + 4, class: "axis-label", "text-anchor": "end" });
+      lbl.textContent = fmtMoneyK(gv);
+      svg.appendChild(lbl);
+    }
+    // zero baseline emphasised if within range
+    var baseLine = el("line", { x1: padL, x2: W - padR, y1: zeroY, y2: zeroY, stroke: "#c7ccd4", "stroke-width": 1.2 });
+    svg.appendChild(baseLine);
+
+    var n = vals.length;
+    var slot = plotW / n;
+    var barW = Math.min(34, slot * 0.55);
+
+    var tooltip = document.getElementById("tooltip");
+    var wrap = document.querySelector(".chart-wrap");
+
+    vals.forEach(function (v, i) {
+      var cx = padL + slot * i + slot / 2;
+      var y = yFor(v);
+      var isFlagged = c.flagged && (i === c.gap.startIdx || i === c.gap.endIdx);
+      var barTop = Math.min(y, zeroY);
+      var barH = Math.max(2, Math.abs(y - zeroY));
+
+      var rect = el("rect", {
+        x: cx - barW / 2, y: barTop, width: barW, height: barH,
+        rx: 4, ry: 4,
+        fill: isFlagged ? "var(--gold)" : "var(--green)",
+        class: "bar"
+      });
+      svg.appendChild(rect);
+
+      rect.addEventListener("mousemove", function (evt) {
+        var rectBox = wrap.getBoundingClientRect();
+        tooltip.innerHTML = MONTHS[i] + "<br><span class='tt-val'>" + fmtMoney(v) + "</span>" + (isFlagged ? "<br>flagged: upsell window" : "");
+        tooltip.style.left = (evt.clientX - rectBox.left) + "px";
+        tooltip.style.top = (evt.clientY - rectBox.top) + "px";
+        tooltip.classList.add("show");
+      });
+      rect.addEventListener("mouseleave", function () { tooltip.classList.remove("show"); });
+
+      // x axis label
+      var xlbl = el("text", { x: cx, y: H - padB + 16, class: "axis-label", "text-anchor": "middle" });
+      xlbl.textContent = MONTHS[i].split(" ")[0];
+      svg.appendChild(xlbl);
+    });
+
+    // callout label above the flagged window
+    if (c.flagged) {
+      var i0 = c.gap.startIdx, i1 = c.gap.endIdx;
+      var cx0 = padL + slot * i0 + slot / 2;
+      var cx1 = padL + slot * i1 + slot / 2;
+      var midX = (cx0 + cx1) / 2;
+      var topY = Math.min(yFor(vals[i0]), yFor(vals[i1])) - 12;
+      topY = Math.max(topY, padT - 6);
+      var arrow = c.type === "dip" ? "▼" : "▲";
+      var pctTxt = (c.gap.pct >= 0 ? "+" : "") + Math.round(c.gap.pct) + "%";
+      var callout = el("text", { x: midX, y: topY, class: "callout-label" + (c.type === "buildup" ? " buildup" : ""), "text-anchor": "middle" });
+      callout.textContent = arrow + " " + pctTxt + " vs trailing avg";
+      svg.appendChild(callout);
+    }
+  }
+
+  function renderDataTable(c) {
+    var body = document.getElementById("dataTableBody");
+    body.innerHTML = "";
+    c.monthly.forEach(function (v, i) {
+      var isFlagged = c.flagged && (i === c.gap.startIdx || i === c.gap.endIdx);
+      var tr = document.createElement("tr");
+      if (isFlagged) tr.className = "flagged";
+      tr.innerHTML = "<td>" + MONTHS[i] + "</td><td>" + fmtMoney(v) + "</td>";
+      body.appendChild(tr);
+    });
+  }
+
+  // ---- AI assist: draft call opener from the already-computed trigger/suggestion text ----
+  var aiTimeoutId = null;
+
+  function buildAiScript(c) {
+    var trigger = document.getElementById("upsellTrigger").textContent.replace(/\.\s*$/, "");
+    var suggestion = document.getElementById("upsellSuggest").textContent;
+
+    if (!c.flagged) {
+      return "Hi, calling about " + c.name + ". Nothing flagged on our end this month, cashflow's tracking steady across the year. Just touching base to see if anything's changed on your side before the next annual review.";
+    }
+
+    var opener = c.type === "dip"
+      ? "Hi, calling about " + c.name + ". I was going through the numbers this week and wanted to flag something before it becomes a bigger issue."
+      : "Hi, calling about " + c.name + ". Good news on the numbers, and I wanted to get in touch while the timing's still right.";
+
+    var body = trigger.charAt(0).toLowerCase() + trigger.slice(1) + ". " + suggestion;
+
+    return opener + " " + body + " Have you got fifteen minutes this week to talk it through?";
+  }
+
+  function renderAiAssist(c) {
+    var aiBtn = document.getElementById("aiBtn");
+    var aiOutput = document.getElementById("aiOutput");
+
+    if (aiTimeoutId) { clearTimeout(aiTimeoutId); aiTimeoutId = null; }
+    aiOutput.innerHTML = "";
+    aiBtn.disabled = false;
+    aiBtn.textContent = "AI: draft talking points";
+
+    aiBtn.onclick = function () {
+      aiBtn.disabled = true;
+      aiBtn.textContent = "Thinking...";
+      aiOutput.innerHTML =
+        '<div class="ai-thinking"><span class="ai-dots"><span></span><span></span><span></span></span>Drafting talking points for ' + c.name + '...</div>';
+
+      var delay = 600 + Math.round(Math.random() * 300);
+      aiTimeoutId = setTimeout(function () {
+        var script = buildAiScript(c);
+        aiOutput.innerHTML = '<p class="ai-script-label">AI-drafted call opener</p><p class="ai-script"></p>';
+        aiOutput.querySelector(".ai-script").textContent = script;
+        aiBtn.disabled = false;
+        aiBtn.textContent = "Redraft talking points";
+      }, delay);
+    };
+  }
+
+  // ---- Upsell panel ----
+  function renderUpsell(c) {
+    var card = document.getElementById("upsellCard");
+    var tagWrap = document.getElementById("upsellTagWrap");
+    var trigger = document.getElementById("upsellTrigger");
+    var suggest = document.getElementById("upsellSuggest");
+    var logBtn = document.getElementById("logBtn");
+
+    card.classList.remove("no-signal");
+
+    if (c.flagged) {
+      var months = c.gap.startIdx === c.gap.endIdx - 1
+        ? MONTHS[c.gap.startIdx].split(" ")[0] + " to " + MONTHS[c.gap.endIdx].split(" ")[0]
+        : MONTHS[c.gap.startIdx];
+      var totalDollars = fmtMoneyK(Math.abs(c.gap.diff * 2));
+      var pctTxt = Math.round(Math.abs(c.gap.pct)) + "%";
+
+      if (c.type === "dip") {
+        tagWrap.innerHTML = '<span class="upsell-tag dip">Revenue dip flagged</span>';
+        trigger.textContent = "Cashflow dropped roughly " + totalDollars + " over " + months + " (" + pctTxt + " below trailing average), " + c.note + ".";
+        suggest.textContent = c.dipSuggest;
+        suggest.classList.remove("plain");
+      } else {
+        tagWrap.innerHTML = '<span class="upsell-tag buildup">Cash buildup flagged</span>';
+        trigger.textContent = "Cash built up roughly " + totalDollars + " over " + months + " (" + pctTxt + " above trailing average), " + c.note + ".";
+        suggest.textContent = c.buildupSuggest;
+        suggest.classList.remove("plain");
+      }
+      logBtn.style.display = "inline-block";
+    } else {
+      card.classList.add("no-signal");
+      tagWrap.innerHTML = '<span class="upsell-tag none">No signal this period</span>';
+      trigger.textContent = c.name + " is trading steadily, " + c.note + ". No threshold breach detected.";
+      suggest.textContent = "No action needed. Keep on the normal annual-review cycle.";
+      suggest.classList.add("plain");
+      logBtn.style.display = "none";
+    }
+
+    logBtn.textContent = c.contacted ? "✓ Logged as contacted" : "Mark as contacted this week";
+    logBtn.className = "log-btn" + (c.contacted ? " logged" : "");
+    logBtn.onclick = function () {
+      c.contacted = true;
+      renderAll();
+    };
+
+    renderAiAssist(c);
+  }
+
+  function renderMeta(c) {
+    document.getElementById("clientMeta").textContent = c.industry;
+  }
+
+  function renderAll() {
+    var c = getClient(selectedId);
+    renderRadar();
+    document.getElementById("clientPicker").value = selectedId;
+    renderMeta(c);
+    renderChart(c);
+    renderDataTable(c);
+    renderUpsell(c);
+  }
+
+  document.getElementById("tableToggle").addEventListener("click", function () {
+    var t = document.getElementById("dataTable");
+    var showing = t.classList.toggle("show");
+    this.textContent = showing ? "Hide table" : "Show as table";
+  });
+
+  renderPicker();
+  renderAll();
+})();
+</script>
+
+</body>
+</html>

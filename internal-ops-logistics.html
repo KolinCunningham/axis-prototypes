@@ -1,0 +1,1043 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Internal Ops & Capacity Logistics: AXIS Partners</title>
+<style>
+  :root {
+    --navy:#1a2b45; --green:#0d7a5f; --light-green:#e8f5f1; --gold:#c9a84c;
+    --cream:#f8f9fb; --border:#e2e8f0; --muted:#6b7280;
+    --red:#c0392b; --light-red:#fdecea; --light-gold:#fbf3df;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background: var(--cream);
+    color: #1f2937;
+  }
+  .sans { font-family: 'Helvetica Neue', Arial, sans-serif; }
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+
+  .panel { margin-bottom: 48px; }
+  .panel-heading { margin-bottom: 6px; }
+  .panel-heading h2 {
+    margin: 0 0 4px 0;
+    font-size: 19px;
+    color: var(--navy);
+  }
+  .panel-heading p {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--muted);
+    font-size: 13.5px;
+    margin: 0 0 20px 0;
+    max-width: 720px;
+  }
+
+  /* ---- Summary strip ---- */
+  .summary-strip {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+  .summary-card {
+    flex: 1 1 190px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    padding: 16px 18px;
+    border-left: 4px solid var(--muted);
+  }
+  .summary-card.high { border-left-color: var(--red); }
+  .summary-card.medium { border-left-color: var(--gold); }
+  .summary-card.low { border-left-color: var(--green); }
+  .summary-card.due { border-left-color: var(--navy); }
+  .summary-card .num {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1;
+  }
+  .summary-card.high .num { color: var(--red); }
+  .summary-card.medium .num { color: #a8842f; }
+  .summary-card.low .num { color: var(--green); }
+  .summary-card.due .num { color: var(--navy); }
+  .summary-card .label {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ---- Controls ---- */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .search-box { flex: 1 1 240px; position: relative; }
+  .search-box input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    background: #fff;
+    color: #1f2937;
+  }
+  .search-box input:focus { outline: none; border-color: var(--green); }
+  .filter-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--muted);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .pill:hover { border-color: var(--navy); color: var(--navy); }
+  .pill.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .pill.active.high { background: var(--red); border-color: var(--red); }
+  .pill.active.medium { background: var(--gold); border-color: var(--gold); color: #3a2f10; }
+  .pill.active.low { background: var(--green); border-color: var(--green); }
+
+  .result-count {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* ---- Staff cards ---- */
+  .staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 16px;
+  }
+  .staff-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    padding: 18px 20px;
+    border-left: 4px solid var(--muted);
+  }
+  .staff-card.overloaded { border-left-color: var(--red); }
+  .staff-card.atcapacity { border-left-color: var(--gold); }
+  .staff-card.hasroom { border-left-color: var(--green); }
+  .staff-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .staff-name { font-weight: bold; color: var(--navy); font-size: 15.5px; }
+  .staff-role { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .team-tag {
+    display: inline-block;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  .team-tag.tax { background: var(--light-green); color: var(--green); }
+  .team-tag.smsf { background: var(--light-gold); color: #a8842f; }
+
+  .load-bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .load-bar-track {
+    flex: 1 1 auto;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .load-bar-fill { height: 100%; border-radius: 4px; }
+  .load-bar-fill.overloaded { background: var(--red); }
+  .load-bar-fill.atcapacity { background: var(--gold); }
+  .load-bar-fill.hasroom { background: var(--green); }
+  .load-pct {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    min-width: 42px;
+    text-align: right;
+  }
+  .load-pct.overloaded { color: var(--red); }
+  .load-pct.atcapacity { color: #a8842f; }
+  .load-pct.hasroom { color: var(--green); }
+
+  .staff-stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 12px;
+  }
+  .staff-stats .stat-label {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+  }
+  .staff-stats .stat-value {
+    display: block;
+    font-family: Georgia, serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: #1f2937;
+    margin-top: 2px;
+  }
+
+  .deadline-pressure {
+    font-size: 12.5px;
+    color: #374151;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .status-badge.overloaded { background: var(--light-red); color: var(--red); }
+  .status-badge.atcapacity { background: var(--light-gold); color: #a8842f; }
+  .status-badge.hasroom { background: var(--light-green); color: var(--green); }
+
+  .suggested-action {
+    font-size: 12.5px;
+    color: var(--navy);
+    background: var(--light-green);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .ai-btn {
+    display: inline-block;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #fff;
+    background: var(--navy);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .ai-btn:hover { background: #243b5e; }
+  .ai-btn:disabled { opacity: 0.6; cursor: default; }
+
+  .ai-thinking {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 12px;
+  }
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .ai-draft {
+    margin-top: 14px;
+  }
+  .ai-draft-title {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .ai-draft-text {
+    white-space: pre-wrap;
+    font-family: Georgia, serif;
+    font-size: 13px;
+    line-height: 1.65;
+    color: #1f2937;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 0;
+  }
+
+  /* ---- Table card ---- */
+  .table-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border-left: 4px solid var(--green);
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+  }
+  thead th {
+    text-align: left;
+    padding: 12px 14px;
+    background: var(--light-green);
+    color: var(--navy);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  thead th:hover { background: #dcf0e8; }
+  thead th .arrow { display: inline-block; margin-left: 4px; opacity: 0.4; font-size: 10px; }
+  thead th.sorted .arrow { opacity: 1; color: var(--green); }
+  tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s ease; }
+  tbody tr:hover { background: var(--light-green); }
+  tbody tr.expanded { background: #f1f7f5; }
+  tbody tr:last-child { border-bottom: none; }
+  td { padding: 12px 14px; vertical-align: middle; font-family: Georgia, serif; }
+  td.sans-cell { font-family: 'Helvetica Neue', Arial, sans-serif; }
+  .client-name { font-weight: bold; color: var(--navy); }
+  .entity-tag {
+    display: inline-block;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+  .risk-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+  .risk-badge.high { background: var(--light-red); color: var(--red); }
+  .risk-badge.low { background: var(--light-green); color: var(--green); }
+
+  .doc-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .doc-bar-track { width: 60px; height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .doc-bar-fill { height: 100%; border-radius: 4px; }
+  .doc-bar-fill.high { background: var(--red); }
+  .doc-bar-fill.medium { background: var(--gold); }
+  .doc-bar-fill.low { background: var(--green); }
+  .doc-pct { font-family:'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: var(--muted); min-width: 62px; }
+
+  .due-soon { color: var(--red); font-weight: bold; }
+
+  /* ---- Detail panel ---- */
+  .detail-row td { padding: 0; background: #f1f7f5; }
+  .detail-inner {
+    padding: 16px 24px 20px 24px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    color: #374151;
+    border-left: 3px solid var(--green);
+    margin: 0 14px 14px 14px;
+    display: none;
+  }
+  .detail-row.open .detail-inner { display: block; }
+  .detail-inner .why-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .detail-inner ul { margin: 0; padding-left: 18px; line-height: 1.7; }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px 24px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .detail-grid .kv-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+  .detail-grid .kv-value { font-size: 13px; color: #1f2937; font-weight: 600; margin-top: 2px; }
+
+  .no-results {
+    padding: 40px;
+    text-align: center;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--muted);
+  }
+
+  @media (max-width: 700px) {
+    table { font-size: 12px; }
+    thead th, td { padding: 8px 8px; }
+    .doc-bar-track { width: 36px; }
+    .staff-stats { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header style="background:linear-gradient(135deg, var(--navy) 0%, #243b5e 100%); color:white; padding:28px 40px;">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; max-width:1100px; margin:0 auto;">
+    <a href="https://www.axispartners.com.au/" target="_blank" rel="noopener">
+      <img src="./axis-logo.png" alt="AXIS Partners" style="height:38px; filter:brightness(0) invert(1);">
+    </a>
+    <div style="text-align:right;">
+      <div style="display:inline-block; background:var(--green); color:white; font-family:'Helvetica Neue',Arial,sans-serif; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:4px 12px; border-radius:20px; margin-bottom:8px;">Bokkas &middot; AI Prototype</div>
+      <h1 style="margin:0; font-size:22px;">Internal Ops & Capacity Logistics</h1>
+    </div>
+  </div>
+</header>
+
+<main>
+  <p class="sans" style="color:var(--muted); font-size:14px; margin-top:0; margin-bottom:32px; max-width:760px;">
+    Internal view only, not something a client would ever see. Since Carollo &amp; Co joined AXIS, the tax team and
+    the SMSF team run under one roof but still plan their EOFY crunch by memory and separate spreadsheets. This
+    pulls both into one screen: who is overloaded right now, and which clients are about to go late purely
+    because paperwork has not landed yet.
+  </p>
+
+  <section class="panel" id="staffPanel">
+    <div class="panel-heading">
+      <h2>Staff Capacity Load Balancer</h2>
+      <p>Current workload against standard fortnight capacity, across both merged teams. A card turns red when
+      someone is booked over capacity, gold when they are right at the line, and green when they have room to
+      take on more.</p>
+    </div>
+    <div class="summary-strip" id="staffSummary"></div>
+    <div class="controls">
+      <div class="filter-pills" id="staffFilterPills">
+        <button class="pill active" data-team="all">All Staff</button>
+        <button class="pill" data-team="Tax Team">Tax Team</button>
+        <button class="pill" data-team="SMSF Team">SMSF Team</button>
+      </div>
+    </div>
+    <div class="staff-grid" id="staffGrid"></div>
+  </section>
+
+  <section class="panel" id="docPanel">
+    <div class="panel-heading">
+      <h2>Document Chase-Up Tracker</h2>
+      <p>Every client still in scope for this EOFY cycle, with documents received against what is still
+      outstanding. Click a row to see exactly what is missing. Clients flagged at risk are on track to lodge
+      late for no reason other than paperwork.</p>
+    </div>
+    <div class="summary-strip" id="docSummary"></div>
+    <div class="controls">
+      <div class="search-box">
+        <input type="text" id="docSearchInput" placeholder="Search by client name&hellip;" class="sans">
+      </div>
+      <div class="filter-pills" id="docFilterPills">
+        <button class="pill active" data-risk="all">All Clients</button>
+        <button class="pill high" data-risk="atrisk">At Risk</button>
+        <button class="pill low" data-risk="ontrack">On Track</button>
+      </div>
+    </div>
+    <div class="result-count" id="docResultCount"></div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th data-key="name">Client <span class="arrow">&#9650;&#9660;</span></th>
+            <th data-key="team">Team <span class="arrow">&#9650;&#9660;</span></th>
+            <th data-key="dueDate">Due Date <span class="arrow">&#9650;&#9660;</span></th>
+            <th data-key="docPct">Docs <span class="arrow">&#9650;&#9660;</span></th>
+            <th data-key="atRiskLabel">Status <span class="arrow">&#9650;&#9660;</span></th>
+          </tr>
+        </thead>
+        <tbody id="docTableBody"></tbody>
+      </table>
+      <div class="no-results" id="docNoResults" style="display:none;">No clients match this search / filter.</div>
+    </div>
+  </section>
+</main>
+
+<footer style="text-align:center; font-family:'Helvetica Neue',Arial,sans-serif; font-size:12px; color:var(--muted); padding:24px; border-top:1px solid var(--border); margin-top:40px;">
+  Prototype built by Bokkas for AXIS Partners &middot; all client data shown is fictional/mock, not connected to any live system &middot; <a href="https://www.axispartners.com.au/" target="_blank" rel="noopener" style="color:var(--green);">axispartners.com.au</a>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- Mock "today", matches the sibling prototypes ----
+  var TODAY = new Date(2026, 6, 28); // 28 Jul 2026
+
+  function daysUntil(dateStr) {
+    var d = new Date(dateStr + "T00:00:00");
+    return Math.round((d - TODAY) / 86400000);
+  }
+
+  function fmtDate(dateStr) {
+    var d = new Date(dateStr + "T00:00:00");
+    return d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function firstName(n) { return n.split(" ")[0]; }
+
+  function randomThinkTime() { return 600 + Math.round(Math.random() * 300); }
+
+  // =========================================================================
+  // PANEL 1: Staff capacity load balancer
+  // =========================================================================
+
+  var STAFF_RAW = [
+    { name: "Marcus Webb", role: "Senior Tax Accountant", team: "Tax Team", activeLodgements: 24, hoursBooked: 80, capacityHours: 75, deadlinePressure: "Six BAS lodgements fall due within the next five days." },
+    { name: "Sandra Kelleher", role: "Tax Accountant", team: "Tax Team", activeLodgements: 19, hoursBooked: 70, capacityHours: 75, deadlinePressure: "Three company tax returns due by the end of the month." },
+    { name: "Dominic Ferraro", role: "Senior Tax Accountant", team: "Tax Team", activeLodgements: 22, hoursBooked: 78, capacityHours: 75, deadlinePressure: "EOFY company return batch, plus four clients still chasing documents." },
+    { name: "Priya Nathan", role: "Tax Accountant", team: "Tax Team", activeLodgements: 10, hoursBooked: 46, capacityHours: 75, deadlinePressure: "Light week, next return is not due until October." },
+    { name: "Grace Lindqvist", role: "SMSF Accountant", team: "SMSF Team", activeLodgements: 9, hoursBooked: 48, capacityHours: 75, deadlinePressure: "Two SMSF annual returns due in early September." },
+    { name: "Tom Alessi", role: "Senior SMSF Accountant", team: "SMSF Team", activeLodgements: 16, hoursBooked: 68, capacityHours: 75, deadlinePressure: "Four SMSF returns due within two weeks, two in pension phase." },
+    { name: "Renee Cho", role: "SMSF Accountant", team: "SMSF Team", activeLodgements: 8, hoursBooked: 44, capacityHours: 75, deadlinePressure: "Quiet fortnight, next deadline is three weeks out." },
+    { name: "Callum Ostrowski", role: "Senior SMSF Accountant", team: "SMSF Team", activeLodgements: 21, hoursBooked: 84, capacityHours: 75, deadlinePressure: "Five SMSF annual returns due within the week, all in pension phase." }
+  ];
+
+  var STAFF = STAFF_RAW.map(function (s, i) {
+    var pct = Math.round((s.hoursBooked / s.capacityHours) * 100);
+    var status = pct >= 100 ? "Overloaded" : pct >= 90 ? "At capacity" : "Has room";
+    return {
+      id: i,
+      name: s.name,
+      role: s.role,
+      team: s.team,
+      activeLodgements: s.activeLodgements,
+      hoursBooked: s.hoursBooked,
+      capacityHours: s.capacityHours,
+      deadlinePressure: s.deadlinePressure,
+      loadPct: pct,
+      status: status
+    };
+  });
+
+  function staffById(id) {
+    for (var i = 0; i < STAFF.length; i++) { if (STAFF[i].id === id) return STAFF[i]; }
+    return null;
+  }
+
+  function statusClass(status) {
+    return status === "Overloaded" ? "overloaded" : status === "At capacity" ? "atcapacity" : "hasroom";
+  }
+
+  function teamClass(team) { return team === "Tax Team" ? "tax" : "smsf"; }
+
+  function workType(team) { return team === "Tax Team" ? "tax lodgements" : "SMSF returns"; }
+
+  // ---- Suggested rebalancing action, computed from the live roster ----
+  function computeSuggestion(staff) {
+    var sameTeam = STAFF.filter(function (s) { return s.team === staff.team && s.id !== staff.id; });
+    var avgHoursPerLodgement = staff.hoursBooked / staff.activeLodgements;
+    var overage = staff.hoursBooked - staff.capacityHours;
+
+    if (staff.status === "Overloaded") {
+      var roomies = sameTeam.filter(function (s) { return s.status === "Has room"; })
+        .sort(function (a, b) { return (b.capacityHours - b.hoursBooked) - (a.capacityHours - a.hoursBooked); });
+      if (roomies.length) {
+        var target = roomies[0];
+        var room = target.capacityHours - target.hoursBooked;
+        var count = Math.max(1, Math.round(overage / avgHoursPerLodgement));
+        var maxTake = Math.max(1, Math.floor(room / avgHoursPerLodgement));
+        count = Math.min(count, maxTake);
+        return {
+          type: "shift",
+          target: target,
+          count: count,
+          text: "Shift " + count + " " + workType(staff.team) + " to " + target.name + ", " + firstName(target.name) + " has room this fortnight."
+        };
+      }
+      return {
+        type: "temp",
+        text: "Bring in temp help for the " + staff.team + " this week, nobody on the team currently has spare capacity."
+      };
+    }
+
+    if (staff.status === "At capacity") {
+      var roomies2 = sameTeam.filter(function (s) { return s.status === "Has room"; })
+        .sort(function (a, b) { return (b.capacityHours - b.hoursBooked) - (a.capacityHours - a.hoursBooked); });
+      if (roomies2.length) {
+        return {
+          type: "watch",
+          target: roomies2[0],
+          text: "Keep an eye on " + staff.name + ", if anything new lands this week send it to " + roomies2[0].name + " instead."
+        };
+      }
+      return {
+        type: "watch",
+        text: "Keep an eye on " + staff.name + ", at full capacity with no spare room on the team right now."
+      };
+    }
+
+    return {
+      type: "room",
+      text: staff.name + " has room to pick up overflow work this fortnight."
+    };
+  }
+
+  function buildReallocationEmail(staff, suggestion) {
+    var name = firstName(staff.name);
+    var lines = [];
+
+    if (suggestion.type === "shift") {
+      var tName = firstName(suggestion.target.name);
+      lines.push("Subject: Shifting some of " + name + "'s workload to " + tName);
+      lines.push("");
+      lines.push("Hi team,");
+      lines.push("");
+      lines.push(name + " is booked at " + staff.hoursBooked + " hours this fortnight against a standard capacity of " + staff.capacityHours + " hours, with " + staff.activeLodgements + " active lodgements on the go. " + staff.deadlinePressure);
+      lines.push("");
+      lines.push(tName + " currently has room, booked at " + suggestion.target.hoursBooked + " of " + suggestion.target.capacityHours + " hours this fortnight.");
+      lines.push("");
+      lines.push("Proposal: move " + suggestion.count + " " + workType(staff.team) + " from " + name + " to " + tName + " this week, so " + name + " can focus on the closest deadlines and " + tName + " picks up the slack without going over capacity.");
+      lines.push("");
+      lines.push("Let me know if this works, or if there is a reason to keep those files with " + name + ".");
+      lines.push("");
+      lines.push("Thanks,");
+      lines.push("Practice Manager");
+    } else if (suggestion.type === "temp") {
+      lines.push("Subject: Temp help needed for the " + staff.team + " this week");
+      lines.push("");
+      lines.push("Hi team,");
+      lines.push("");
+      lines.push(name + " is booked at " + staff.hoursBooked + " hours this fortnight against a standard capacity of " + staff.capacityHours + " hours, with " + staff.activeLodgements + " active lodgements on the go. " + staff.deadlinePressure);
+      lines.push("");
+      lines.push("Nobody else on the " + staff.team + " has spare hours to absorb the overflow right now.");
+      lines.push("");
+      lines.push("Proposal: bring in a temp or a contractor for the rest of this week to take some of the load off " + name + ", rather than risk a late lodgement.");
+      lines.push("");
+      lines.push("Thanks,");
+      lines.push("Practice Manager");
+    } else if (suggestion.type === "watch") {
+      lines.push("Subject: " + name + " is at full capacity this fortnight");
+      lines.push("");
+      lines.push("Hi team,");
+      lines.push("");
+      lines.push(name + " is booked at " + staff.hoursBooked + " of " + staff.capacityHours + " hours this fortnight, with " + staff.activeLodgements + " active lodgements. " + staff.deadlinePressure);
+      lines.push("");
+      if (suggestion.target) {
+        lines.push("No action needed yet, but if anything new comes in this week please route it to " + suggestion.target.name + " instead, who currently has room.");
+      } else {
+        lines.push("No spare room on the team right now, so please avoid adding anything further to " + name + "'s queue this week if it can wait.");
+      }
+      lines.push("");
+      lines.push("Thanks,");
+      lines.push("Practice Manager");
+    } else {
+      lines.push("Subject: " + name + " has spare capacity this fortnight");
+      lines.push("");
+      lines.push("Hi team,");
+      lines.push("");
+      lines.push(name + " is booked at " + staff.hoursBooked + " of " + staff.capacityHours + " hours this fortnight, with " + staff.activeLodgements + " active lodgements. " + staff.deadlinePressure);
+      lines.push("");
+      lines.push("If anyone on the " + staff.team + " is stretched this week, please send overflow work " + name + "'s way.");
+      lines.push("");
+      lines.push("Thanks,");
+      lines.push("Practice Manager");
+    }
+
+    return lines.join("\n");
+  }
+
+  var staffState = { teamFilter: "all", draft: {} };
+
+  var staffSummary = document.getElementById("staffSummary");
+  var staffFilterPills = document.getElementById("staffFilterPills");
+  var staffGrid = document.getElementById("staffGrid");
+
+  function renderStaffSummary() {
+    var overloaded = STAFF.filter(function (s) { return s.status === "Overloaded"; }).length;
+    var atCapacity = STAFF.filter(function (s) { return s.status === "At capacity"; }).length;
+    var hasRoom = STAFF.filter(function (s) { return s.status === "Has room"; }).length;
+    var totalLodgements = STAFF.reduce(function (sum, s) { return sum + s.activeLodgements; }, 0);
+
+    staffSummary.innerHTML =
+      '<div class="summary-card high"><div class="num">' + overloaded + '</div><div class="label">Overloaded</div></div>' +
+      '<div class="summary-card medium"><div class="num">' + atCapacity + '</div><div class="label">At capacity</div></div>' +
+      '<div class="summary-card low"><div class="num">' + hasRoom + '</div><div class="label">Has room</div></div>' +
+      '<div class="summary-card due"><div class="num">' + totalLodgements + '</div><div class="label">Active lodgements, firm wide</div></div>';
+  }
+
+  function renderStaffGrid() {
+    var filtered = STAFF.filter(function (s) {
+      return staffState.teamFilter === "all" || s.team === staffState.teamFilter;
+    });
+
+    var html = "";
+    filtered.forEach(function (s) {
+      var sc = statusClass(s.status);
+      var suggestion = computeSuggestion(s);
+      var draft = staffState.draft[s.id];
+
+      html += '<div class="staff-card ' + sc + '" data-id="' + s.id + '">' +
+        '<div class="staff-card-top">' +
+        '<div><div class="staff-name">' + escapeHtml(s.name) + '</div><div class="staff-role sans">' + escapeHtml(s.role) + '</div></div>' +
+        '<span class="team-tag ' + teamClass(s.team) + '">' + s.team + '</span>' +
+        '</div>' +
+        '<div class="load-bar-wrap">' +
+        '<div class="load-bar-track"><div class="load-bar-fill ' + sc + '" style="width:' + Math.min(s.loadPct, 100) + '%;"></div></div>' +
+        '<span class="load-pct ' + sc + '">' + s.loadPct + '%</span>' +
+        '</div>' +
+        '<div class="staff-stats">' +
+        '<div><span class="stat-label sans">Active lodgements</span><span class="stat-value">' + s.activeLodgements + '</span></div>' +
+        '<div><span class="stat-label sans">Hours booked</span><span class="stat-value">' + s.hoursBooked + ' of ' + s.capacityHours + '</span></div>' +
+        '</div>' +
+        '<div class="deadline-pressure sans">' + escapeHtml(s.deadlinePressure) + '</div>' +
+        '<div><span class="status-badge ' + sc + '">' + s.status + '</span></div>' +
+        '<div class="suggested-action sans"><strong>Suggested action:</strong> ' + escapeHtml(suggestion.text) + '</div>' +
+        '<button class="ai-btn" data-staff-id="' + s.id + '"' + (draft && draft.status === "loading" ? ' disabled' : '') + '>AI: draft the reallocation email</button>' +
+        renderStaffDraft(s.id, draft) +
+        '</div>';
+    });
+
+    staffGrid.innerHTML = html;
+
+    Array.prototype.forEach.call(staffGrid.querySelectorAll(".ai-btn"), function (btn) {
+      btn.addEventListener("click", function () {
+        var id = parseInt(btn.getAttribute("data-staff-id"), 10);
+        staffState.draft[id] = { status: "loading", text: "" };
+        renderStaffGrid();
+        setTimeout(function () {
+          var staff = staffById(id);
+          var suggestion = computeSuggestion(staff);
+          staffState.draft[id] = { status: "done", text: buildReallocationEmail(staff, suggestion) };
+          renderStaffGrid();
+        }, randomThinkTime());
+      });
+    });
+  }
+
+  function renderStaffDraft(id, draft) {
+    if (!draft) return "";
+    if (draft.status === "loading") {
+      return '<div class="ai-thinking"><span class="spinner"></span><span>Working out the fairest reallocation&hellip;</span></div>';
+    }
+    return '<div class="ai-draft"><div class="ai-draft-title">Drafted email</div><pre class="ai-draft-text">' + escapeHtml(draft.text) + '</pre></div>';
+  }
+
+  staffFilterPills.addEventListener("click", function (e) {
+    var btn = e.target.closest(".pill");
+    if (!btn) return;
+    Array.prototype.forEach.call(staffFilterPills.querySelectorAll(".pill"), function (p) { p.classList.remove("active"); });
+    btn.classList.add("active");
+    staffState.teamFilter = btn.getAttribute("data-team");
+    renderStaffGrid();
+  });
+
+  // =========================================================================
+  // PANEL 2: Document chase-up tracker
+  // =========================================================================
+
+  var CLIENTS_RAW = [
+    { name: "Amberley Ridge Trading Pty Ltd", team: "Tax", contact: "David", dueDate: "2026-08-10", docsReceived: 7, docsTotal: 10, outstandingDocs: ["Vehicle logbook", "Rental statement Q3", "Business loan statement"] },
+    { name: "Harborview Dental SMSF", team: "SMSF", contact: "Fiona", dueDate: "2026-08-02", docsReceived: 4, docsTotal: 9, outstandingDocs: ["Share dividend statements", "Actuarial certificate", "Pension payment records", "Property valuation", "Member contribution statements"] },
+    { name: "Kintail Constructions Pty Ltd", team: "Tax", contact: "Aaron", dueDate: "2026-08-20", docsReceived: 9, docsTotal: 11, outstandingDocs: ["Subcontractor payment summaries", "Fuel tax credit records"] },
+    { name: "Bellrose Family Trust", team: "Tax", contact: "Melissa", dueDate: "2026-07-31", docsReceived: 3, docsTotal: 8, outstandingDocs: ["Trust distribution resolutions", "Rental statement Q4", "Private company loan agreement", "Dividend statements", "Prior year losses schedule"] },
+    { name: "Corella Bay Retirement SMSF", team: "SMSF", contact: "Grant", dueDate: "2026-08-05", docsReceived: 5, docsTotal: 10, outstandingDocs: ["Actuarial certificate", "Investment income statements", "Pension commencement documents", "Property valuation", "Related party lease"] },
+    { name: "Thornleigh Motor Repairs", team: "Tax", contact: "Nadia", dueDate: "2026-09-01", docsReceived: 10, docsTotal: 10, outstandingDocs: [] },
+    { name: "Wollstonecraft Legal Group SMSF", team: "SMSF", contact: "Owen", dueDate: "2026-08-08", docsReceived: 6, docsTotal: 9, outstandingDocs: ["Share dividend statements", "Actuarial certificate", "Trust deed amendment"] },
+    { name: "Palm Grove Hospitality Pty Ltd", team: "Tax", contact: "Sienna", dueDate: "2026-08-03", docsReceived: 4, docsTotal: 9, outstandingDocs: ["Vehicle logbook", "Rental statement Q3", "Stocktake summary", "Wage records Q4", "Insurance payout documentation"] },
+    { name: "Killara Ridge Orthodontics SMSF", team: "SMSF", contact: "Patrick", dueDate: "2026-08-14", docsReceived: 8, docsTotal: 10, outstandingDocs: ["Pension payment records", "Property valuation"] },
+    { name: "Wattlebank Engineering Co", team: "Tax", contact: "Kylie", dueDate: "2026-07-30", docsReceived: 2, docsTotal: 9, outstandingDocs: ["Vehicle logbook", "Business loan statement", "Rental statement Q3", "Dividend statements", "Trust distribution resolutions", "Fuel tax credit records", "Wage records Q4"] },
+    { name: "Seaforth Wealth SMSF", team: "SMSF", contact: "Brendan", dueDate: "2026-08-22", docsReceived: 9, docsTotal: 9, outstandingDocs: [] },
+    { name: "Roseville Chase Accounting Trust", team: "Tax", contact: "Louise", dueDate: "2026-08-06", docsReceived: 5, docsTotal: 10, outstandingDocs: ["Rental statement Q3", "Dividend statements", "Trust distribution resolutions", "Business loan statement", "Fuel tax credit records"] },
+    { name: "Turrella Import Export Pty Ltd", team: "Tax", contact: "Farid", dueDate: "2026-08-12", docsReceived: 6, docsTotal: 9, outstandingDocs: ["Vehicle logbook", "Stocktake summary", "Wage records Q4"] }
+  ];
+
+  var CLIENTS = CLIENTS_RAW.map(function (c, i) {
+    var pct = Math.round((c.docsReceived / c.docsTotal) * 100);
+    var du = daysUntil(c.dueDate);
+    var atRisk = pct < 60 && du <= 21;
+    return {
+      id: i,
+      name: c.name,
+      team: c.team,
+      contact: c.contact,
+      dueDate: c.dueDate,
+      dueDaysUntil: du,
+      docsReceived: c.docsReceived,
+      docsTotal: c.docsTotal,
+      docPct: pct,
+      outstandingDocs: c.outstandingDocs,
+      atRisk: atRisk,
+      atRiskLabel: atRisk ? "At risk" : "On track"
+    };
+  });
+
+  function clientById(id) {
+    for (var i = 0; i < CLIENTS.length; i++) { if (CLIENTS[i].id === id) return CLIENTS[i]; }
+    return null;
+  }
+
+  function docBarClass(pct) { return pct >= 80 ? "low" : pct >= 50 ? "medium" : "high"; }
+
+  function buildChaserEmail(client) {
+    var due = fmtDate(client.dueDate);
+    var chaseBy = new Date(client.dueDate + "T00:00:00");
+    chaseBy.setDate(chaseBy.getDate() - 5);
+    var chaseByLabel = chaseBy.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
+    var lodgementType = client.team === "SMSF" ? "SMSF annual return" : "tax lodgement";
+    var lines = [];
+
+    lines.push("Subject: Documents still needed for your " + lodgementType);
+    lines.push("");
+    lines.push("Hi " + client.contact + ",");
+    lines.push("");
+    lines.push("We are getting close to the lodgement deadline for " + client.name + " (" + due + ") and there are a few items still outstanding. So far we have received " + client.docsReceived + " of " + client.docsTotal + " documents, thank you for those.");
+    lines.push("");
+    lines.push("Still needed:");
+    client.outstandingDocs.forEach(function (d) { lines.push("  * " + d); });
+    lines.push("");
+    if (client.atRisk) {
+      lines.push("With the deadline this close, we do need these fairly urgently to avoid lodging late or having to request an extension.");
+    } else {
+      lines.push("There is no immediate concern on timing, but the sooner these land the sooner we can finalise everything.");
+    }
+    lines.push("");
+    lines.push("If you can send these through by " + chaseByLabel + ", that gives us enough time to finish the return well ahead of the " + due + " deadline.");
+    lines.push("");
+    lines.push("Thanks,");
+    lines.push("AXIS Partners");
+
+    return lines.join("\n");
+  }
+
+  var docState = { search: "", riskFilter: "all", sortKey: "atRisk", sortDir: "desc", expandedId: null, draft: {} };
+
+  var docSummary = document.getElementById("docSummary");
+  var docSearchInput = document.getElementById("docSearchInput");
+  var docFilterPills = document.getElementById("docFilterPills");
+  var docResultCount = document.getElementById("docResultCount");
+  var docNoResults = document.getElementById("docNoResults");
+  var docTableBody = document.getElementById("docTableBody");
+  var docHeaders = document.querySelectorAll("#docPanel thead th[data-key]");
+
+  function renderDocSummary() {
+    var atRisk = CLIENTS.filter(function (c) { return c.atRisk; }).length;
+    var complete = CLIENTS.filter(function (c) { return c.docPct === 100; }).length;
+    var avgPct = Math.round(CLIENTS.reduce(function (sum, c) { return sum + c.docPct; }, 0) / CLIENTS.length);
+
+    docSummary.innerHTML =
+      '<div class="summary-card due"><div class="num">' + CLIENTS.length + '</div><div class="label">Clients in this cycle</div></div>' +
+      '<div class="summary-card high"><div class="num">' + atRisk + '</div><div class="label">At risk of late lodgement</div></div>' +
+      '<div class="summary-card low"><div class="num">' + complete + '</div><div class="label">Fully received</div></div>' +
+      '<div class="summary-card medium"><div class="num">' + avgPct + '%</div><div class="label">Average docs received</div></div>';
+  }
+
+  function getFilteredDocs() {
+    var q = docState.search.trim().toLowerCase();
+    return CLIENTS.filter(function (c) {
+      if (docState.riskFilter === "atrisk" && !c.atRisk) return false;
+      if (docState.riskFilter === "ontrack" && c.atRisk) return false;
+      if (q && c.name.toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+  }
+
+  function getSortedDocs(list) {
+    var key = docState.sortKey;
+    var dir = docState.sortDir === "asc" ? 1 : -1;
+    return list.slice().sort(function (a, b) {
+      var av = a[key], bv = b[key];
+      if (key === "dueDate") { av = a.dueDaysUntil; bv = b.dueDaysUntil; }
+      if (key === "atRisk") { av = a.atRisk ? 1 : 0; bv = b.atRisk ? 1 : 0; }
+      if (typeof av === "string") av = av.toLowerCase();
+      if (typeof bv === "string") bv = bv.toLowerCase();
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+  }
+
+  function renderDocDraft(client, draft) {
+    if (!draft) return "";
+    if (draft.status === "loading") {
+      return '<div class="ai-thinking"><span class="spinner"></span><span>Pulling together the outstanding items&hellip;</span></div>';
+    }
+    return '<div class="ai-draft"><div class="ai-draft-title">Drafted email</div><pre class="ai-draft-text">' + escapeHtml(draft.text) + '</pre></div>';
+  }
+
+  function renderDocTable() {
+    renderDocSummary();
+    var filtered = getSortedDocs(getFilteredDocs());
+
+    docResultCount.textContent = filtered.length + (filtered.length === 1 ? " client shown" : " clients shown") +
+      (docState.riskFilter !== "all" ? " &middot; filtered to " + (docState.riskFilter === "atrisk" ? "at risk" : "on track") : "") +
+      (docState.search ? " &middot; search: “" + docState.search + "”" : "");
+
+    if (!filtered.length) {
+      docTableBody.innerHTML = "";
+      docNoResults.style.display = "block";
+      return;
+    }
+    docNoResults.style.display = "none";
+
+    var html = "";
+    filtered.forEach(function (c) {
+      var isOpen = docState.expandedId === c.id;
+      var dueLabel = fmtDate(c.dueDate);
+      var dueSoonClass = c.dueDaysUntil <= 7 ? "due-soon" : "";
+      var bc = docBarClass(c.docPct);
+      var draft = docState.draft[c.id];
+
+      html += '<tr class="data-row' + (isOpen ? ' expanded' : '') + '" data-id="' + c.id + '">' +
+        '<td class="client-name">' + escapeHtml(c.name) + '</td>' +
+        '<td class="sans-cell"><span class="entity-tag">' + c.team + '</span></td>' +
+        '<td class="sans-cell ' + dueSoonClass + '">' + dueLabel + (c.dueDaysUntil < 0 ? ' (overdue)' : c.dueDaysUntil <= 7 ? ' (this week)' : '') + '</td>' +
+        '<td class="sans-cell"><div class="doc-bar-wrap"><div class="doc-bar-track"><div class="doc-bar-fill ' + bc + '" style="width:' + c.docPct + '%;"></div></div><span class="doc-pct">' + c.docsReceived + ' of ' + c.docsTotal + '</span></div></td>' +
+        '<td class="sans-cell"><span class="risk-badge ' + (c.atRisk ? 'high' : 'low') + '">' + c.atRiskLabel + '</span></td>' +
+        '</tr>' +
+        '<tr class="detail-row' + (isOpen ? ' open' : '') + '" data-detail-for="' + c.id + '">' +
+        '<td colspan="5">' +
+        '<div class="detail-inner">' +
+        '<div class="why-title">Outstanding documents</div>' +
+        (c.outstandingDocs.length
+          ? '<ul>' + c.outstandingDocs.map(function (d) { return '<li>' + escapeHtml(d) + '</li>'; }).join('') + '</ul>'
+          : '<p style="margin:0;">All documents received for this cycle.</p>') +
+        '<div class="detail-grid">' +
+        '<div><div class="kv-label">Team</div><div class="kv-value">' + c.team + '</div></div>' +
+        '<div><div class="kv-label">Due</div><div class="kv-value">' + dueLabel + '</div></div>' +
+        '<div><div class="kv-label">Docs received</div><div class="kv-value">' + c.docsReceived + ' of ' + c.docsTotal + '</div></div>' +
+        '<div><div class="kv-label">Status</div><div class="kv-value">' + c.atRiskLabel + '</div></div>' +
+        '</div>' +
+        (c.outstandingDocs.length
+          ? '<div style="margin-top:14px;"><button class="ai-btn" data-client-id="' + c.id + '"' + (draft && draft.status === "loading" ? ' disabled' : '') + '>AI: draft the client document chaser</button>' + renderDocDraft(c, draft) + '</div>'
+          : '') +
+        '</div>' +
+        '</td></tr>';
+    });
+    docTableBody.innerHTML = html;
+
+    Array.prototype.forEach.call(docTableBody.querySelectorAll("tr.data-row"), function (row) {
+      row.addEventListener("click", function () {
+        var id = parseInt(row.getAttribute("data-id"), 10);
+        docState.expandedId = (docState.expandedId === id) ? null : id;
+        renderDocTable();
+      });
+    });
+
+    Array.prototype.forEach.call(docTableBody.querySelectorAll(".ai-btn"), function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var id = parseInt(btn.getAttribute("data-client-id"), 10);
+        docState.draft[id] = { status: "loading", text: "" };
+        renderDocTable();
+        setTimeout(function () {
+          var client = clientById(id);
+          docState.draft[id] = { status: "done", text: buildChaserEmail(client) };
+          renderDocTable();
+        }, randomThinkTime());
+      });
+    });
+  }
+
+  function updateDocHeaderIndicators() {
+    Array.prototype.forEach.call(docHeaders, function (th) {
+      th.classList.toggle("sorted", th.getAttribute("data-key") === docState.sortKey);
+      var arrow = th.querySelector(".arrow");
+      if (th.getAttribute("data-key") === docState.sortKey) {
+        arrow.textContent = docState.sortDir === "asc" ? "▲" : "▼";
+      } else {
+        arrow.textContent = "▲▼";
+      }
+    });
+  }
+
+  Array.prototype.forEach.call(docHeaders, function (th) {
+    th.addEventListener("click", function () {
+      var key = th.getAttribute("data-key");
+      if (docState.sortKey === key) {
+        docState.sortDir = docState.sortDir === "asc" ? "desc" : "asc";
+      } else {
+        docState.sortKey = key;
+        docState.sortDir = "desc";
+      }
+      updateDocHeaderIndicators();
+      renderDocTable();
+    });
+  });
+
+  docFilterPills.addEventListener("click", function (e) {
+    var btn = e.target.closest(".pill");
+    if (!btn) return;
+    Array.prototype.forEach.call(docFilterPills.querySelectorAll(".pill"), function (p) { p.classList.remove("active"); });
+    btn.classList.add("active");
+    docState.riskFilter = btn.getAttribute("data-risk");
+    renderDocTable();
+  });
+
+  docSearchInput.addEventListener("input", function () {
+    docState.search = docSearchInput.value;
+    renderDocTable();
+  });
+
+  // ---- Initial render ----
+  renderStaffSummary();
+  renderStaffGrid();
+  updateDocHeaderIndicators();
+  renderDocTable();
+})();
+</script>
+
+</body>
+</html>

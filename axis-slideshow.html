@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bokkas × AXIS Partners: AI Capabilities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1E3A5F;
+    --blue:#2563EB;
+    --blue-dark:#1D4ED8;
+    --blue-light:#60A5FA;
+    --blue-pale:#93C5FD;
+    --orange:#E8622A;
+    --cream:#F8F3EE;
+    --tan:#C4956A;
+    --grey:#6B6B6B;
+    --grey-light:#9B9B9B;
+    --ink:#0D0D0D;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    font-family:'Inter',Arial,sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    display:flex; flex-direction:column;
+    overflow:hidden;
+  }
+  /* deck */
+  .deck{ position:relative; flex:1; overflow:hidden; }
+  .slide{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:6vh 9vw;
+    opacity:0; transform:translateX(24px);
+    transition:opacity .35s ease, transform .35s ease;
+    pointer-events:none;
+  }
+  .slide.active{ opacity:1; transform:translateX(0); pointer-events:auto; }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+    color:var(--blue-dark); margin-bottom:18px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--orange);}
+
+  h1{ font-size:clamp(28px,4vw,46px); line-height:1.15; margin:0 0 16px; color:var(--navy); font-weight:800; }
+  h1 span{ color:var(--blue); }
+  .lede{ font-size:clamp(15px,1.6vw,19px); color:var(--grey); max-width:640px; line-height:1.6; margin:0; }
+
+  /* cover slide */
+  .cover{ align-items:flex-start; }
+  .logos{ display:flex; align-items:center; gap:22px; margin-bottom:40px; }
+  .logos .x{ color:var(--grey-light); font-size:20px; font-weight:400; }
+  .bokka-mark{ display:flex; align-items:center; gap:10px; }
+  .bokka-mark svg{ width:34px; height:34px; }
+  .bokka-mark b{ font-size:20px; font-weight:800; color:var(--navy); letter-spacing:-0.5px; }
+  .axis-logo{ height:26px; width:auto; }
+
+  /* grid / card slides */
+  .card-row{ display:flex; gap:22px; margin-top:8px; flex-wrap:wrap; }
+  .card{
+    background:white; border:1px solid #e5ded8; border-radius:14px;
+    padding:22px 24px; flex:1; min-width:220px;
+    box-shadow:0 1px 2px rgba(30,58,95,.04);
+  }
+  .card .tag{ font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; }
+  .card.risk .tag{ color:var(--navy); }
+  .card.grow .tag{ color:var(--orange); }
+  .card h3{ margin:8px 0 6px; font-size:17px; color:var(--navy); }
+  .card p{ margin:0; font-size:13.5px; color:var(--grey); line-height:1.55; }
+
+  /* team slide */
+  .team-row{ display:flex; gap:26px; margin-top:12px; flex-wrap:wrap; }
+  .person-card{
+    background:white; border:1px solid #e5ded8; border-radius:14px;
+    padding:22px; display:flex; gap:16px; align-items:flex-start;
+    flex:1; min-width:320px; max-width:460px; box-shadow:0 1px 2px rgba(30,58,95,.04);
+  }
+  .person-card img{
+    width:64px; height:64px; border-radius:50%; object-fit:cover; flex-shrink:0;
+    border:2px solid var(--blue-pale);
+  }
+  .person-card h3{ margin:0 0 2px; font-size:17px; color:var(--navy); }
+  .person-card .role{ font-size:12px; font-weight:700; color:var(--orange); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px; }
+  .person-card p{ margin:0 0 12px; font-size:13px; color:var(--grey); line-height:1.55; }
+  .person-card .tags{ display:flex; gap:6px; flex-wrap:wrap; }
+  .person-card .tags span{
+    font-size:10.5px; font-weight:700; letter-spacing:0.4px; text-transform:uppercase;
+    color:var(--blue-dark); background:#eef3fc; border:1px solid var(--blue-pale);
+    padding:3px 9px; border-radius:20px;
+  }
+
+  /* idea slides */
+  .idea-slide .status{
+    display:inline-block; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+    padding:4px 12px; border-radius:20px; margin-bottom:22px; width:fit-content;
+  }
+  .status.live{ background:#e8f5f1; color:#0d7a5f; border:1px solid #0d7a5f; }
+  .status.pending{ background:#f1f1ef; color:var(--grey); border:1px solid #d8d4cf; }
+  .idea-body{ font-size:15.5px; color:#3a3a3a; max-width:640px; line-height:1.65; margin-bottom:10px; }
+  .idea-body strong{ color:var(--navy); }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; margin-top:22px;
+    font-size:14px; font-weight:700; text-decoration:none;
+    padding:12px 22px; border-radius:8px; width:fit-content;
+    transition:transform .15s ease;
+  }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.enabled{ background:var(--blue); color:white; }
+  .btn.disabled{ background:#e9e6e1; color:var(--grey-light); pointer-events:none; }
+
+  /* close slide */
+  .close-slide .steps{ margin-top:20px; }
+  .steps li{ font-size:15px; color:#3a3a3a; margin-bottom:10px; }
+
+  footer.chrome{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 9vw; border-top:1px solid #e5ded8; background:white;
+  }
+  .brand-foot{ font-size:12px; color:var(--grey-light); font-weight:500; }
+  .nav{ display:flex; align-items:center; gap:16px; }
+  .dots{ display:flex; gap:7px; }
+  .dots button{
+    width:7px; height:7px; border-radius:50%; border:none; background:#ddd6cf;
+    cursor:pointer; padding:0;
+  }
+  .dots button.on{ background:var(--blue); width:20px; border-radius:4px; transition:width .2s ease; }
+  .arrow{
+    border:1px solid #ddd6cf; background:white; color:var(--navy);
+    width:34px; height:34px; border-radius:50%; cursor:pointer;
+    font-size:15px; display:flex; align-items:center; justify-content:center;
+  }
+  .arrow:hover{ background:var(--cream); }
+  .arrow:disabled{ opacity:.3; cursor:default; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 1. Cover -->
+  <section class="slide cover active">
+    <div class="logos">
+      <div class="bokka-mark">
+        <svg viewBox="0 0 80 80" fill="none">
+          <rect x="23" y="4"  width="15" height="10" rx="2" fill="#93C5FD"/>
+          <rect x="19" y="14" width="19" height="13" rx="3" fill="#60A5FA"/>
+          <rect x="14" y="27" width="24" height="16" rx="3" fill="#2563EB"/>
+          <line x1="38" y1="4"  x2="38" y2="43" stroke="#C4956A" stroke-width="4" stroke-linecap="round"/>
+          <rect x="38" y="22" width="13" height="22" rx="4" fill="#1E3A5F" transform="rotate(5 44 33)"/>
+          <circle cx="50" cy="14" r="8" fill="#2563EB"/>
+          <rect x="49" y="32" width="5" height="14" rx="2.5" fill="#1E3A5F" transform="rotate(-18 51 36)"/>
+          <rect x="38" y="43" width="7" height="17" rx="3" fill="#1E3A5F" transform="rotate(25 41.5 43)"/>
+          <rect x="47" y="43" width="7" height="17" rx="3" fill="#1E3A5F" transform="rotate(-25 50.5 43)"/>
+        </svg>
+        <b>bokkas</b>
+      </div>
+      <span class="x">×</span>
+      <img class="axis-logo" src="axis-logo.png" alt="AXIS Partners">
+    </div>
+    <div class="eyebrow"><span class="dot"></span>AI Capabilities Walkthrough</div>
+    <h1>Practical AI for<br><span>AXIS Partners</span></h1>
+    <p class="lede">A short look at where AI can protect the firm from risk and help it grow revenue, with working prototypes you can click through today.</p>
+  </section>
+
+  <!-- 2. Who we are -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>Who's Bokkas</div>
+    <h1>We build <span>working AI tools</span>,<br>not slide decks.</h1>
+    <p class="lede">Sydney-based AI consultancy. We design, build and train teams on custom AI tools and automations for small and mid-size businesses, hands-on, not theoretical. Everything you'll see today is a real, clickable prototype, not a mockup.</p>
+  </section>
+
+  <!-- 3. Team -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>Who You'll Be Working With</div>
+    <h1>Meet <span>Kolin & Charlotte</span></h1>
+    <div class="team-row">
+      <div class="person-card">
+        <img src="kolin.jpg" alt="Kolin Cunningham">
+        <div>
+          <h3>Kolin Cunningham</h3>
+          <div class="role">Founder &amp; CEO</div>
+          <p>Background in signals intelligence and open-source intelligence work, large-scale digital product delivery including Visa's FIFA Women's World Cup 2023, plus cybersecurity and innovation policy work across the space and energy sectors. At Bokkas he leads AI strategy and client delivery, translating what a model can actually do into what it means for the business.</p>
+          <div class="tags"><span>Intelligence &amp; Data Systems</span><span>Large-Scale Delivery</span><span>AI Strategy</span></div>
+        </div>
+      </div>
+      <div class="person-card">
+        <img src="charlotte.jpg" alt="Charlotte Cordier">
+        <div>
+          <h3>Charlotte Cordier</h3>
+          <div class="role">Operations Partner</div>
+          <p>17 years leading Lean and continuous improvement transformation across manufacturing, defence, energy and media (Thales, Landis+Gyr, AstraZeneca, SBS), currently a transformation consultant running enterprise-wide programs across Australia and the US. At Bokkas she builds the process redesign and change management scaffolding that makes AI adoption actually stick, not a proof of concept that gathers dust.</p>
+          <div class="tags"><span>Lean &amp; Process Redesign</span><span>Change Management</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Frame -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>The Frame</div>
+    <h1>Two sides of <span>the ledger</span></h1>
+    <p class="lede">Today's ideas split into what protects the firm and what grows it, four working prototypes, no overlap with the earlier sample deck.</p>
+    <div class="card-row">
+      <div class="card risk">
+        <div class="tag">Protect</div>
+        <h3>Lodgement Risk Triage</h3>
+        <p>Whole-book view of who's at risk of missing a deadline, before it's late.</p>
+      </div>
+      <div class="card grow">
+        <div class="tag">Grow</div>
+        <h3>Trust Growth · Cashflow Timing</h3>
+        <p>Proactive advice and right-moment upsell, systematised instead of memory-dependent.</p>
+      </div>
+      <div class="card grow">
+        <div class="tag">Grow</div>
+        <h3>Unbilled Work Detector</h3>
+        <p>Surfaces work already being done for clients but never invoiced.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Idea 1 -->
+  <section class="slide idea-slide">
+    <div class="status live">Live prototype</div>
+    <div class="eyebrow"><span class="dot"></span>Idea 1 · Protect the firm</div>
+    <h1>Portfolio-Wide <span>Lodgement Risk Triage</span></h1>
+    <p class="idea-body"><strong>Problem:</strong> a missed deadline gets noticed client-by-client, often after it's already late.<br><strong>What it does:</strong> ranks every client in the book by risk, using lodgement history, document completeness and complexity, tells partners who to chase this week.</p>
+    <a class="btn enabled" href="lodgement-risk-triage.html" target="_blank">Open live prototype →</a>
+  </section>
+
+  <!-- 6. Idea 2 -->
+  <section class="slide idea-slide">
+    <div class="status live">Live prototype</div>
+    <div class="eyebrow"><span class="dot"></span>Idea 2 · Grow the firm</div>
+    <h1>Family Trust & <span>Structuring Growth Options</span></h1>
+    <p class="idea-body"><strong>Problem:</strong> structuring advice is usually reactive, clients don't know what they don't know.<br><strong>What it does:</strong> enter a client's situation, get the 2 to 5 most relevant structuring options with a plain-English reason each applies.</p>
+    <a class="btn enabled" href="family-trust-growth.html" target="_blank">Open live prototype →</a>
+  </section>
+
+  <!-- 7. Idea 3 -->
+  <section class="slide idea-slide">
+    <div class="status live">Live prototype</div>
+    <div class="eyebrow"><span class="dot"></span>Idea 3 · Grow the firm</div>
+    <h1>Cashflow Gap & <span>Upsell Timing</span></h1>
+    <p class="idea-body"><strong>Problem:</strong> the best moment to offer extra services is when a client's cashflow shifts, nobody's watching for it between annual reviews.<br><strong>What it does:</strong> visualises 12-month cashflow per client, flags unusual gaps or buildups, and suggests the talking point.</p>
+    <a class="btn enabled" href="cashflow-gap-upsell.html" target="_blank">Open live prototype →</a>
+  </section>
+
+  <!-- 8. Idea 4 -->
+  <section class="slide idea-slide">
+    <div class="status live">Live prototype</div>
+    <div class="eyebrow"><span class="dot"></span>Idea 4 · Grow the firm</div>
+    <h1>Unbilled Work / <span>Scope-Creep Detector</span></h1>
+    <p class="idea-body"><strong>Problem:</strong> staff quietly do more for a client than the engagement covers, and none of it gets invoiced.<br><strong>What it does:</strong> compares estimated work effort against what's invoiced, surfaces a dollar "unbilled gap" per client, worst offenders first.</p>
+    <a class="btn enabled" href="unbilled-work-detector.html" target="_blank">Open live prototype →</a>
+  </section>
+
+  <!-- 9. Bonus -->
+  <section class="slide idea-slide">
+    <div class="status live">Live prototype</div>
+    <div class="eyebrow"><span class="dot"></span>Bonus · Internal ops, not client-facing</div>
+    <h1>Staff Capacity & <span>Document Chase-Up</span></h1>
+    <p class="idea-body"><strong>Problem:</strong> post-merger, two teams with different skills run EOFY by hand, matching lodgement deadlines to staff capacity, and chasing outstanding client documents, both tracked in spreadsheets and memory.<br><strong>What it does:</strong> one dashboard flags overloaded staff with a rebalancing suggestion, and tracks documents received versus outstanding per client.</p>
+    <a class="btn enabled" href="internal-ops-logistics.html" target="_blank">Open live prototype →</a>
+  </section>
+
+  <!-- 10. Close -->
+  <section class="slide close-slide">
+    <div class="eyebrow"><span class="dot"></span>Next Step</div>
+    <h1>Let's walk through <span>your book together</span></h1>
+    <p class="lede">These prototypes are the start of the conversation, not the end of it. The real next step is a working session where we go through AXIS's actual client book with you, see what's really causing pain day to day, and match it against these ideas (or a new one).</p>
+    <ol class="steps">
+      <li>Bring a slice of the real book, a handful of clients, de-identified if needed.</li>
+      <li>Walk through it together: what's actually slow, risky or leaking revenue right now.</li>
+      <li>Match the pain to a prototype worth building for real, or scope a new one.</li>
+    </ol>
+  </section>
+
+</div>
+
+<footer class="chrome">
+  <div class="brand-foot">Bokkas · bokkas.com</div>
+  <div class="nav">
+    <button class="arrow" id="prev">←</button>
+    <div class="dots" id="dots"></div>
+    <button class="arrow" id="next">→</button>
+  </div>
+</footer>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  let i = 0;
+  slides.forEach((_, idx) => {
+    const b = document.createElement('button');
+    if (idx === 0) b.classList.add('on');
+    b.addEventListener('click', () => go(idx));
+    dotsEl.appendChild(b);
+  });
+  const dots = dotsEl.querySelectorAll('button');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    dots.forEach((d, idx) => d.classList.toggle('on', idx === i));
+    prevBtn.disabled = i === 0;
+    nextBtn.disabled = i === slides.length - 1;
+  }
+  prevBtn.addEventListener('click', () => go(i - 1));
+  nextBtn.addEventListener('click', () => go(i + 1));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') go(i + 1);
+    if (e.key === 'ArrowLeft') go(i - 1);
+  });
+  go(0);
+</script>
+
+</body>
+</html>
